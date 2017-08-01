@@ -16,8 +16,8 @@ All new roles capabilities defaults to `false`. So we add just capabilities that
  * Create a new role
  */
 
-// Init Geniem\roles singleton class
-$roles_instance = \Geniem\roles();
+// Init Geniem\Roles
+$roles_instance = new \Geniem\Roles();
 
 // Caps to add to the new role
 $new_role_caps = array(
@@ -53,6 +53,38 @@ $roles_instance::remove_caps( 'administrator', $admin_removable_caps );
 $roles_instance::grant_super_admin_cap( 1 );
 ```
 
+### Remove menu pages by role
+You can remove single admin menu page with `string` value or multiple pages with `array` value.
+
+```
+// Removable admin pages array
+$admin_removable_admin_pages = [
+    'edit.php', // posts
+    'edit.php?post_type=page' //  pages
+];
+
+// Remove multiple menu pages
+$roles::remove_role_menu_pages( 'administrator', $admin_removable_admin_pages );
+
+// Remove single menu page
+$roles::remove_role_menu_pages( 'administrator', 'edit.php' );
+```
+
+### Remove submenu pages by role and parent page
+You can remove single admin submenu page with `string` value or multiple pages with `array` value.
+
+```
+// An array of removable submenu pages
+$admin_removable_submenu_pages = [
+    'nav-menus.php'
+];
+
+// Remove multiple submenu pages
+$roles::remove_role_submenu_pages( 'administrator', 'themes.php', $admin_removable_submenu_pages );
+
+// Remove single submenu page
+$roles::remove_role_submenu_pages( 'administrator', 'themes.php', 'nav-menus.php' );
+```
+
 TODO
-### Remove menu pages by user
 ### Translations

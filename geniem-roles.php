@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.0.2
+ * Version: 0.0.3
  * Author: Timi-Artturi Mäkelä / Geniem Oy
  * Author URI: https://geniem.fi
  **/
@@ -13,14 +13,7 @@ namespace Geniem;
 /**
  * Geniem Roles
  */
-final class Roles {
-
-    /**
-     * Singleton DustPress instance
-     *
-     * @var [type]
-     */
-    private static $instance;
+class Roles {
 
     /**
      * Roles
@@ -30,29 +23,15 @@ final class Roles {
     protected static $roles;
 
     /**
-     * Init roles singletone
-     */
-    public static function instance() {
-        if ( ! isset( self::$instance ) ) {
-            self::$instance = new Roles();
-        }
-        return self::$instance;
-    }
-
-    /**
      * Roles __constuctor
      */
-    protected function __construct() {
+    public function __construct() {
 
         // Get all current roles
         self::$roles = self::get_current_roles();
 
         // Actions
-        /* add_action( 'init', array( __CLASS__, 'init' ) ); */
-        add_action( 'init', __NAMESPACE__ . '\Roles::init' );
-
-        // Todo: figure out why wont run in the hook (maybe singleton problem)
-        add_action( 'admin_menu', __NAMESPACE__ . '\Roles::remove_role_menu_pages' );
+        add_action( 'init', array( __CLASS__, 'init' ) );
     }
 
 
@@ -166,28 +145,77 @@ final class Roles {
      * @param string $menu_page
      * @return void
      */
-    public static function remove_role_menu_pages( $role_slug, $menu_page = null ) {
+    public static function remove_role_menu_pages( $role_slug = '', $menu_pages = null ) {
 
-        // user object
-        $user = wp_get_current_user();
+        // Run in admin_menu hook when called outside class
+        add_action( 'admin_menu', function() use ( $role_slug, $menu_pages ) {
 
-        // remove menu pages by role
-        // Note: have to check if not doing ajax to avoid errors in admin_init hook
-        if ( in_array( $role_slug, $user->roles, true ) && ! wp_doing_ajax() ) {
+            // user object
+            $user = wp_get_current_user();
 
-            if ( ! empty( $menu_page ) ) {
+            // remove menu pages by role
+            // Note: have to check if not doing ajax to avoid errors in admin_init hook
+            if ( in_array( $role_slug, $user->roles, true ) && ! wp_doing_ajax() ) {
 
-                /* \remove_menu_page( $menu_page ); */
+                if ( ! empty( $menu_pages ) ) {
 
-                // if multiple menu pages in array
-/*                 if ( is_array( $menu_pages ) && ! empty( $menu_pages ) ) {
-                    foreach ( $menu_pages as $menu_page ) {
-                        remove_menu_page( $menu_page );
+                    // if multiple menu pages in array
+                    if ( is_array( $menu_pages ) && ! empty( $menu_pages ) ) {
+                        foreach ( $menu_pages as $menu_page ) {
+                            remove_menu_page( $menu_page );
+                        }
                     }
-                } */
+                    else {
+                        remove_menu_page( $menu_pages );
+                    }
 
+                }
+                else {
+                    error_log( 'remove_role_menu_pages called without valid $menu_pages' );
+                }
             }
-        }
+        });
+    }
+
+    /**
+     * Remove submenu pages by parent_slug and role
+     *
+     * @param [type] $role_slug
+     * @param [type] $parent_slug
+     * @param [type] $menu_pages
+     * @return void
+     */
+    public static function remove_role_submenu_pages( $role_slug = '', $parent_slug = '', $menu_pages = null ) {
+
+        // Run in admin_menu hook when called outside class
+        add_action( 'admin_menu', function() use ( $role_slug, $parent_slug, $menu_pages ) {
+
+            // user object
+            $user = wp_get_current_user();
+
+            // remove submenu pages by role
+            // Note: have to check if not doing ajax to avoid errors in admin_init hook
+            if ( in_array( $role_slug, $user->roles, true ) && ! wp_doing_ajax() ) {
+
+                if ( ! empty( $menu_pages ) ) {
+
+                    // if multiple menu pages in array
+                    if ( is_array( $menu_pages ) && ! empty( $menu_pages ) ) {
+                        foreach ( $menu_pages as $menu_page ) {
+                            remove_submenu_page( $parent_slug, $menu_page );
+                        }
+                    }
+                    // If not array remove page by slug
+                    else {
+                        remove_submenu_page( $parent_slug, $menu_pages );
+                    }
+
+                }
+                else {
+                    error_log( 'remove_role_menu_pages called without valid $menu_pages' );
+                }
+            }
+        });
     }
 
     /**
@@ -332,14 +360,4 @@ class Role {
     public function get_caps( $slug ) {
         return get_role( $slug )->capabilities;
     }
-}
-
-
-/**
- * Returns the Geniem Roles singleton.
- *
- * @return object
- */
-function roles() {
-    return Roles::instance();
 }
