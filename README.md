@@ -63,7 +63,7 @@ $admin_removable_admin_pages = [
     'edit.php?post_type=page' //  pages
 ];
 
-// Remove multiple menu pages
+// Remove multiple menu pages remove_role_menu_pages( $role_slug, $menu_pages )
 $roles::remove_role_menu_pages( 'administrator', $admin_removable_admin_pages );
 
 // Remove single menu page
@@ -79,7 +79,7 @@ $admin_removable_submenu_pages = [
     'nav-menus.php'
 ];
 
-// Remove multiple submenu pages
+// Remove multiple submenu pages remove_role_submenu_pages( $role_slug, $parent_slug, $menu_pages )
 $roles::remove_role_submenu_pages( 'administrator', 'themes.php', $admin_removable_submenu_pages );
 
 // Remove single submenu page
