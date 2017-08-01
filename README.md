@@ -41,7 +41,7 @@ if ( is_wp_error( $new_role ) ) {
 }
 ```
 
-### Remove caps from a role
+### Remove caps from role
 ```php
 // Define removable caps in an array
 $admin_removable_caps = [
@@ -53,6 +53,20 @@ $admin_removable_caps = [
 // Run function remove_caps for desired wp role
 $roles_instance::remove_caps( 'administrator', $admin_removable_caps );
 ```
+
+### Add caps for role
+```php
+// Define removable caps in an array
+$admin_add_caps = [
+    'edit_users',
+    'delete_users',
+    'create_users'
+];
+
+// Run function remove_caps for desired wp role
+$roles_instance::add_caps( 'administrator', $admin_add_caps );
+```
+
 ### Grant super admin cap for a user
 ```php
 $roles_instance::grant_super_admin_cap( 1 );
