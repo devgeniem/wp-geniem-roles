@@ -91,7 +91,11 @@ class Roles {
     }
 
     /**
-     * Renames roles with new_name.
+     * Rename a role with new_name
+     *
+     * @param [type] $slug
+     * @param [type] $new_name
+     * @return void
      */
     public function rename( $slug, $new_name ) {
 
@@ -102,6 +106,31 @@ class Roles {
         // Rename role
         $wp_roles->roles[$slug]['name']   = $new_name;
         $wp_roles->role_names[$slug]      = $new_name;
+    }
+
+    /**
+     * Add caps to the role
+     *
+     * @param string $role_slug
+     * @param [type] $caps
+     * @return no return
+     */
+    public static function add_caps( $role_slug = '', $caps ) {
+
+        if ( ! empty( $role ) || ! empty( $caps ) ) {
+            $role = get_role( $role_slug );
+
+            // Loop through caps
+            if ( is_array( $caps ) && ! empty( $caps ) ) {
+                foreach ( $caps as $cap ) {
+                    // Add the capability.
+                    $role->add_cap( $cap );
+                }
+            }
+        }
+        else {
+            error_log( 'called Geniem/remove_caps without parameters' );
+        }
     }
 
     /**
