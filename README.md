@@ -1,6 +1,10 @@
 # Geniem Roles
 Wrapper classes for WordPress role creation and editing.
 
+## Installation
+Move file geniem-roles.php to WordPress mu-plugins folder.
+Create file to your theme where you call wrapper class functions. See the examples from below.
+
 ## Examples
 
 ### Create a new role with capabilities
@@ -32,7 +36,23 @@ if ( is_wp_error( $new_role ) ) {
 }
 ```
 
-### Remove menu pages by user
-
 ### Remove caps from a role
+```php
+// Define removable caps in an array
+$admin_removable_caps = [
+    'edit_users',
+    'delete_users',
+    'create_users'
+];
 
+// Run function remove_caps for desired wp role
+$roles_instance::remove_caps( 'administrator', $admin_removable_caps );
+```
+### Grant super admin cap for a user
+```php
+$roles_instance::grant_super_admin_cap( 1 );
+```
+
+TODO
+### Remove menu pages by user
+### Translations

@@ -10,7 +10,9 @@
 
 namespace Geniem;
 
-
+/**
+ * Geniem Roles
+ */
 final class Roles {
 
     /**
@@ -46,11 +48,11 @@ final class Roles {
         self::$roles = self::get_current_roles();
 
         // Actions
-        add_action( 'init', [ $this, __NAMESPACE__ . '\Roles::init' ] );
+        /* add_action( 'init', array( __CLASS__, 'init' ) ); */
+        add_action( 'init', __NAMESPACE__ . '\Roles::init' );
 
         // Todo: figure out why wont run in the hook (maybe singleton problem)
-        add_action( 'admin_init', [ $this, __NAMESPACE__ . '\Roles::remove_role_menu_pages' ] );
-
+        add_action( 'admin_menu', __NAMESPACE__ . '\Roles::remove_role_menu_pages' );
     }
 
 
@@ -61,11 +63,12 @@ final class Roles {
      */
     public static function init() {
         // Do the code.
+
     }
 
     /**
-    * Returns all active roles
-    */
+     * Returns all active roles
+     */
     public static function get_current_roles() {
         global $wp_roles;
 
@@ -76,11 +79,11 @@ final class Roles {
     }
 
     /**
-    * Create new roles
-    * @param string $slug
-    * @param  $name
-    * @param boolean $caps
-    */
+     * Create new roles
+     * @param string $slug
+     * @param  $name
+     * @param boolean $caps
+     */
     public static function create_role( $slug, $name, $caps ) {
 
         // If role already exists return WP_Error
@@ -92,6 +95,7 @@ final class Roles {
             $caps = array_merge( Role::get_default_caps(), $caps );
 
             // add roles
+            // Todo: how to handle translations
             add_role( $slug, __( $name ), $caps );
         }
     }
@@ -121,11 +125,25 @@ final class Roles {
         $wp_roles->role_names[$slug]      = $new_name;
     }
 
-    /*
-     * Filters gettext_with_context
+    /**
+     * Remove role caps
      */
-    public function translate_role_names() {
+    public static function remove_caps( $role_slug = '', $caps ) {
 
+        if ( ! empty( $role ) || ! empty( $caps ) ) {
+            $role = get_role( $role_slug );
+
+            // Remove desired caps from a role.
+            if ( is_array( $caps ) && ! empty( $caps ) ) {
+                foreach ( $caps as $cap ) {
+                    // Remove the capability.
+                    $role->remove_cap( $cap );
+                }
+            }
+        }
+        else {
+            error_log( 'called Geniem/remove_caps without parameters' );
+        }
     }
 
     /**
@@ -134,6 +152,7 @@ final class Roles {
      * @param string $slug
      */
     public function get( $slug ) {
+
         // Get from cache
         if ( isset( self::$roles[ $slug ] ) ) {
             return self::$roles[ $slug ];
@@ -147,15 +166,44 @@ final class Roles {
      * @param string $menu_page
      * @return void
      */
-    public static function remove_role_menu_pages( $role_slug, $menu_page ) {
+    public static function remove_role_menu_pages( $role_slug, $menu_page = null ) {
 
+        // user object
         $user = wp_get_current_user();
 
+        // remove menu pages by role
+        // Note: have to check if not doing ajax to avoid errors in admin_init hook
         if ( in_array( $role_slug, $user->roles, true ) && ! wp_doing_ajax() ) {
-            // Todo loop passed menu pages and remove all pages at once
-            remove_menu_page( $menu_page );
+
+            if ( ! empty( $menu_page ) ) {
+
+                /* \remove_menu_page( $menu_page ); */
+
+                // if multiple menu pages in array
+/*                 if ( is_array( $menu_pages ) && ! empty( $menu_pages ) ) {
+                    foreach ( $menu_pages as $menu_page ) {
+                        remove_menu_page( $menu_page );
+                    }
+                } */
+
+            }
         }
     }
+
+    /**
+     * Add a user to the Super admin user list in WordPress Multisite
+     *
+     * @return no return
+     */
+    public static function grant_super_admin_cap( $user_id ) {
+        grant_super_admin( $user_id );
+    }
+
+    /*
+     * Filters gettext_with_context
+     */
+    /* public function translate_role_names() {
+    } */
 
 }
 
@@ -202,50 +250,50 @@ class Role {
             'promote_users'             => true,
 
             // WordPress default capabilities
-            'activate_plugins'              => false,
-            'delete_others_pages'           => false,
-            'delete_others_posts'           => false,
-            'delete_pages'                  => false,
-            'delete_posts'                  => false,
-            'delete_private_pages'          => false,
-            'delete_private_posts'          => false,
-            'delete_published_pages'        => false,
-            'delete_published_posts'        => false,
-            'edit_dashboard'                => false,
-            'edit_others_pages'             => false,
-            'edit_others_posts'             => false,
-            'edit_pages'                    => false,
-            'edit_posts'                    => false,
-            'edit_private_pages'            => false,
-            'edit_private_posts'            => false,
-            'edit_published_pages'          => false,
-            'edit_published_posts'          => false,
-            'edit_theme_options'            => false,
-            'export'                        => false,
-            'import'                        => false,
-            'list_users'                    => false,
-            'manage_categories'             => false,
-            'manage_links'                  => false,
-            'manage_options'                => false,
-            'moderate_comments'             => false,
-            'promote_users'                 => false,
-            'publish_pages'                 => false,
-            'publish_posts'                 => false,
-            'read_private_pages'            => false,
-            'read_private_posts'            => false,
-            'read'                          => false,
-            'remove_users'                  => false,
-            'switch_themes'                 => false,
-            'upload_files'                  => false
+            'activate_plugins'          => false,
+            'delete_others_pages'       => false,
+            'delete_others_posts'       => false,
+            'delete_pages'              => false,
+            'delete_posts'              => false,
+            'delete_private_pages'      => false,
+            'delete_private_posts'      => false,
+            'delete_published_pages'    => false,
+            'delete_published_posts'    => false,
+            'edit_dashboard'            => false,
+            'edit_others_pages'         => false,
+            'edit_others_posts'         => false,
+            'edit_pages'                => false,
+            'edit_posts'                => false,
+            'edit_private_pages'        => false,
+            'edit_private_posts'        => false,
+            'edit_published_pages'      => false,
+            'edit_published_posts'      => false,
+            'edit_theme_options'        => false,
+            'export'                    => false,
+            'import'                    => false,
+            'list_users'                => false,
+            'manage_categories'         => false,
+            'manage_links'              => false,
+            'manage_options'            => false,
+            'moderate_comments'         => false,
+            'promote_users'             => false,
+            'publish_pages'             => false,
+            'publish_posts'             => false,
+            'read_private_pages'        => false,
+            'read_private_posts'        => false,
+            'read'                      => false,
+            'remove_users'              => false,
+            'switch_themes'             => false,
+            'upload_files'              => false
         );
 
-        // filter default roles
+        // filter default caps
         return apply_filters( 'geniem/roles/default_roles', $defaults );
     }
 
     /**
-    * Constructor
-    */
+     * Constructor
+     */
     public function __construct( $slug, $name, $defaults ) {
 
         Roles::create_role( $slug, $name, $defaults );
@@ -264,6 +312,10 @@ class Role {
 
     /**
      * Makes db changes do not run everytime.
+     *
+     * @param [type] $role_slug
+     * @param [type] $cap
+     * @return void
      */
     public function add_cap( $role_slug, $cap ) {
         if ( in_array( $role_slug, (array) $user->roles ) ) {
@@ -272,29 +324,16 @@ class Role {
     }
 
     /**
-     * Makes db changes do not run everytime.
-     */
-    public function remove_cap( $cap ) {
-
-    }
-
-    /*
-     * Get all caps for a role.
+     * Get all caps for by role.
+     *
+     * @param [type] $slug
+     * @return void
      */
     public function get_caps( $slug ) {
         return get_role( $slug )->capabilities;
     }
-
-    /**
-     * add_super_admin_cap
-     *
-     * @return no return
-     */
-    public function add_super_admin_cap() {
-
-    }
-
 }
+
 
 /**
  * Returns the Geniem Roles singleton.
