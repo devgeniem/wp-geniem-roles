@@ -5,6 +5,11 @@ Wrapper classes for WordPress role creation and editing.
 Move file geniem-roles.php to WordPress mu-plugins folder.
 Create file to your theme where you call wrapper class functions. See the examples from below.
 
+## Composer installation
+```
+require devgeniem/wp-geniem-roles
+```
+
 ## Examples
 
 ### Create a new role with capabilities

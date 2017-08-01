@@ -1,0 +1,21 @@
+{
+  "name": "devgeniem/wp-geniem-roles",
+  "type": "wordpress-muplugin",
+  "license": "GPL-2.0",
+  "description": "Wrapper class for WordPress role creation and manipulation.",
+  "homepage": "https://github.com/devgeniem/wp-geniem-roles",
+  "authors": [
+    {
+      "name": "Timi-Artturi Mäkelä",
+      "email": "timi.makela@geniem.com",
+      "homepage": "https://github.com/Liblastic"
+    }
+  ],
+  "keywords": [
+    "Geniem","wordpress","wp","roles","wrapper class", "must use"
+  ],
+  "require": {
+    "php": ">=7.0",
+    "composer/installers": ">=v1.0.12"
+  }
+}
