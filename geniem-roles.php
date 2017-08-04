@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.0.6
+ * Version: 0.0.7
  * Author: Timi-Artturi Mäkelä / Geniem Oy
  * Author URI: https://geniem.fi
  **/
@@ -32,6 +32,7 @@ class Roles {
 
         // Actions
         add_action( 'init', array( __CLASS__, 'init' ) );
+        add_action( 'init', array( __CLASS__, 'add_options_page' ) );
     }
 
 
@@ -60,7 +61,7 @@ class Roles {
     /**
      * Create new roles
      * @param string $slug
-     * @param  $name
+     * @param $name
      * @param boolean $caps
      */
     public static function create_role( $slug, $name, $caps ) {
@@ -262,6 +263,92 @@ class Roles {
     /* public function translate_role_names() {
     } */
 
+    /**
+     * Adds WP Ga options settings
+     */
+    public static function add_options_page() {
+        if ( is_admin() ) {
+
+
+            // Run in admin_menu hook when called outside class
+            add_action( 'admin_menu', function() {
+
+                \add_menu_page(
+                    __( 'Geniem Roles',      'wp-geniem-roles' ), // page title
+                    __( 'Geniem Roles',      'wp-geniem-roles' ), // menu title
+                    'read',          // capability
+                    'wp-geniem-roles', // menu slug
+                    array( __CLASS__, 'geniem_roles_html' ), // render function
+                    'dashicons-universal-access',
+                    80
+                );
+            });
+        }
+    }
+
+    /**
+     * Geniem roles printable html
+     *
+     * @return void
+     */
+    public static function geniem_roles_html() {
+
+        echo '<div class="geniem-roles">';
+        echo '<h1 class="dashicons-before dashicons-universal-access"> '. __( 'Geniem roles', 'geniem-roles' ) . '</h1>';
+        echo '<p>'. __( 'This page lists all current roles and their enabled capabilities.', 'geniem-roles' ) . '</p>';
+
+        // Do not list cap if in $legacy_caps
+        $legacy_caps = [ 'level_10', 'level_9', 'level_8', 'level_7', 'level_6', 'level_5', 'level_4', 'level_3', 'level_2', 'level_1', 'level_0' ];
+
+        if ( ! empty( self::$roles ) ) {
+
+            $i = 1;
+
+            // Roles
+            foreach ( self::$roles as $role ) {
+
+                // Add wrappers by modulo != 2
+                if ( ( $i % 2 ) != 0 ) {
+                    echo '<div style="display: flex;">';
+                }
+
+                // Single role wrap
+                echo '<div class="geniem-roles__single-role" style="
+                    width: 50%;
+                    float: left;
+                    margin: 1rem 1rem 0rem 0rem;
+                    background: white;
+                    padding: 1rem;
+                ">';
+
+                    // Name
+                    echo '<h2>' . $role['name'] . '</h2>';
+
+                    echo '<ul>';
+                        // Caps
+                        if ( ! empty( $role['capabilities'] ) ) {
+                            foreach ( $role['capabilities'] as $key => $value ) {
+
+                                $formated_cap = \str_replace( '_', ' ', $key );
+                                if ( ! in_array( $key, $legacy_caps ) ) {
+                                    echo '<li>' . $formated_cap . '</li>';
+                                }
+                            }
+                        }
+                    echo '</ul>';
+
+                echo '</div>'; // geniem-roles__single-role
+
+                // Close wrapper by modulo == 2
+                if ( ( $i % 2 ) == 0 ) { echo '</div>'; }
+                $i++;
+            } // foreach ends
+
+        }
+
+        echo '<div>'; // wrapper ends
+    }
+
 }
 
 /**
@@ -341,7 +428,10 @@ class Role {
             'read'                      => false,
             'remove_users'              => false,
             'switch_themes'             => false,
-            'upload_files'              => false
+            'upload_files'              => false,
+
+            // Geniem Roles
+            'geniem_roles'              => false
         );
 
         // filter default caps
