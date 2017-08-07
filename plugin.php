@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.0.7
+ * Version: 0.0.8
  * Author: Timi-Artturi Mäkelä / Geniem Oy
  * Author URI: https://geniem.fi
  **/
@@ -33,8 +33,19 @@ class Roles {
         // Actions
         add_action( 'init', array( __CLASS__, 'init' ) );
         add_action( 'init', array( __CLASS__, 'add_options_page' ) );
+        add_action( 'admin_enqueue_scripts', array( __CLASS__, 'geniem_roles_styles' ) );
     }
 
+    /**
+     * Enqueue styles
+     */
+    public static function geniem_roles_styles( $hook ) {
+
+        // Skip enqueue geniem-roles-styles if not on wp-geniem-roles menu page
+        if ( 'toplevel_page_wp-geniem-roles' != $hook ) { return; }
+
+        wp_enqueue_style( 'geniem_roles_styles', plugin_dir_url( __FILE__ ) . 'geniem-roles-styles.css', false, '1.0.5' );
+    }
 
     /**
      * Undocumented function
@@ -303,23 +314,12 @@ class Roles {
         if ( ! empty( self::$roles ) ) {
 
             $i = 1;
-
+            echo '<div class="geniem-roles__wrapper">';
             // Roles
             foreach ( self::$roles as $role ) {
 
-                // Add wrappers by modulo != 2
-                if ( ( $i % 2 ) != 0 ) {
-                    echo '<div style="display: flex;">';
-                }
-
                 // Single role wrap
-                echo '<div class="geniem-roles__single-role" style="
-                    width: 50%;
-                    float: left;
-                    margin: 1rem 1rem 0rem 0rem;
-                    background: white;
-                    padding: 1rem;
-                ">';
+                echo '<div class="geniem-roles__single-role">';
 
                     // Name
                     echo '<h2>' . $role['name'] . '</h2>';
@@ -340,12 +340,12 @@ class Roles {
                 echo '</div>'; // geniem-roles__single-role
 
                 // Close wrapper by modulo == 2
-                if ( ( $i % 2 ) == 0 ) { echo '</div>'; }
-                $i++;
+/*                 if ( ( $i % 2 ) == 0 ) { }
+                $i++; */
             } // foreach ends
-
         }
 
+        echo '</div>';
         echo '<div>'; // wrapper ends
     }
 

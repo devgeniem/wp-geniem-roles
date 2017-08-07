@@ -1,0 +1,25 @@
+/**
+ * Geniem roles admin styles
+ */
+.geniem-roles {
+
+}
+
+.geniem-roles__wrapper {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.geniem-roles__single-role {
+    width: calc( 50% - 3rem );
+    float: left;
+    margin: 1rem 1rem 0rem 0rem;
+    background: white;
+    padding: 1rem;
+}
+
+@media ( max-width: 768px ) {
+    .geniem-roles__single-role {
+        width: 100%;
+    }
+}
