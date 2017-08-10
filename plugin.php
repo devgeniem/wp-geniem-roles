@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: Timi-Artturi Mäkelä / Geniem Oy
  * Author URI: https://geniem.fi
  **/
@@ -13,13 +13,19 @@ namespace Geniem;
 /**
  * Geniem Roles
  */
-class Roles {
+final class Roles {
 
     /**
      * Roles
      * @var [type]
      */
     protected static $roles;
+
+    /**
+     * Singleton Geniem Roles instance
+     * @var [type]
+     */
+    private static $instance;
 
     /**
      * Init roles singletone
@@ -184,6 +190,7 @@ class Roles {
     /**
      * If role exists return the role
      * insert int or string
+     * 
      * @param string $slug
      */
     public static function get( $slug ) {
@@ -208,7 +215,7 @@ class Roles {
 
     /**
      * Remove menu pages from a role.
-     * TODO MITENKÄ TÄTÄ VOI AJAA NIIN ETTÄ AJAUTUU admin_init :ssä remove_menu_page on pakko poistaa admin_initissä
+     * 
      * @param string $role_slug
      * @param string $menu_page
      * @return void
@@ -295,12 +302,6 @@ class Roles {
         grant_super_admin( $user_id );
     }
 
-    /*
-     * Filters gettext_with_context
-     */
-    /* public function translate_role_names() {
-    } */
-
     /**
      * Adds WP Ga options settings
      */
@@ -311,10 +312,10 @@ class Roles {
             add_action( 'admin_menu', function() {
 
                 \add_menu_page(
-                    __( 'Geniem Roles',      'wp-geniem-roles' ), // page title
-                    __( 'Geniem Roles',      'wp-geniem-roles' ), // menu title
-                    'activate_plugins',          // capability
-                    'wp-geniem-roles', // menu slug
+                    __( 'Geniem Roles', 'wp-geniem-roles' ), // page title
+                    __( 'Geniem Roles', 'wp-geniem-roles' ), // menu title
+                    'activate_plugins',                      // capability
+                    'wp-geniem-roles',                       // menu slug
                     array( __CLASS__, 'geniem_roles_html' ), // render function
                     'dashicons-universal-access',
                     80
@@ -383,13 +384,18 @@ class Roles {
                 return $value;
             }
         }
-
     }
+
+    /*
+     * Filters gettext_with_context
+     */
+    /* public function translate_role_names() {
+    } */
 
 }
 
 /**
- * Add and edit role
+ * Class Role which handles a intance of a single editable role
  */
 class Role {
 

@@ -30,8 +30,8 @@ All new roles capabilities defaults to `false`. So we add just capabilities that
  * Create a new role
  */
 
-// Init Geniem\Roles
-$roles_instance = new \Geniem\Roles();
+// Init Geniem\Roles singleton
+\Geniem\roles();
 
 // Caps to be added to the new role
 // all caps default to false see the details \Geniem\Role::get_default_caps()
@@ -82,16 +82,14 @@ $admin_removable_caps = [
 $roles_instance::remove_caps( 'administrator', $admin_removable_caps );
 ```
 
-### Grant super admin cap for a single user
-```php
-\Geniem\Roles::grant_super_admin_cap( 1 );
-```
-
-### Remove menu pages by role
+### Remove menu pages from a role
 You can remove single admin menu page with `string` value or multiple pages with an `array` value.
 
 ```php
-// Removable admin pages array
+// Get a role
+$admin = \Geniem\Roles::get( 'administrator' );
+
+// Define removable admin pages array
 $admin_removable_admin_pages = [
     'edit.php', // posts
     'edit.php?post_type=page' //  pages
@@ -101,7 +99,7 @@ $admin_removable_admin_pages = [
 $admin->remove_menu_pages( $admin_removable_admin_pages );
 ```
 
-### Remove submenu pages by role and parent page
+### Remove submenu pages from a role
 You can remove single admin submenu page with `string` value or multiple pages with `array` value.
 
 ```php
@@ -111,8 +109,20 @@ $admin_removable_submenu_pages = [
 ];
 
 // Remove multiple submenu pages remove_role_submenu_pages( $role_slug, $parent_slug, $menu_pages )
-$roles::remove_role_submenu_pages( 'administrator', 'themes.php', $admin_removable_submenu_pages );
-
-// Remove single submenu page
-$roles::remove_role_submenu_pages( 'administrator', 'themes.php', 'nav-menus.php' );
+$admin->remove_submenu_pages( 'administrator', 'themes.php', $admin_removable_submenu_pages );
 ```
+
+### Grant super admin cap for a single user
+```php
+\Geniem\Roles::grant_super_admin_cap( 1 );
+```
+
+## Filters
+### Filter new role default roles
+`apply_filters( 'geniem/roles/default_roles', $defaults );`
+
+### Admin side role listing
+`wp-geniem-roles` creates a admin page which lists all current active roles and their capabilities in the admin side. Admin page can be seen for roles that can `can_activate_plugins`.
+
+#### screenshot
+![Admin side screenshot](docs/images/screenshot-admin.png)
