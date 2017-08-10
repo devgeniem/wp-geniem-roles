@@ -121,7 +121,7 @@ $admin->remove_submenu_pages( 'administrator', 'themes.php', $admin_removable_su
 ```
 
 ## Filters
-### Filter new role default roles
+### Filter new role default capabilities
 `apply_filters( 'geniem/roles/default_roles', $defaults );`
 
 ### Admin side role listing
