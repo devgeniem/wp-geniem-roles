@@ -1,5 +1,5 @@
 # Geniem Roles
-Wrapper classes for developers for WordPress role creation and editing.
+Wrapper classes for developers to create and manipulate WordPress roles.
 
 ## Installation
 Move plugin to your WordPress installation `plugins/` folder.
@@ -21,20 +21,23 @@ composer.json
 
 ## Examples
 
+### Initializing Geniem Roles
+First init \Geniem\Roles singleton by running a function `\Geniem\roles();`
+```php
+// Init Geniem\Roles singleton
+\Geniem\roles();
+```
+
 ### Create a new role with capabilities
 All new roles capabilities defaults to `false`. So we add just capabilities that we want to apply for the role. See the example code for a hands on example.
 
 ```php
 /**
- * A Geniem roles example
  * Create a new role
  */
 
-// Init Geniem\Roles singleton
-\Geniem\roles();
-
 // Caps to be added to the new role
-// all caps default to false see the details \Geniem\Role::get_default_caps()
+// all caps default to false see the details plugin.php \Geniem\Role::get_default_caps()
 $new_role_caps = array(
     "activate_plugins"              => true,
     "delete_others_pages"           => true,
