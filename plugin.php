@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.1.0
+ * Version: 0.1.1
  * Author: Timi-Artturi Mäkelä / Geniem Oy
  * Author URI: https://geniem.fi
  **/
@@ -313,7 +313,7 @@ class Roles {
                 \add_menu_page(
                     __( 'Geniem Roles',      'wp-geniem-roles' ), // page title
                     __( 'Geniem Roles',      'wp-geniem-roles' ), // menu title
-                    'read',          // capability
+                    'activate_plugins',          // capability
                     'wp-geniem-roles', // menu slug
                     array( __CLASS__, 'geniem_roles_html' ), // render function
                     'dashicons-universal-access',
@@ -557,14 +557,3 @@ class Role {
 function roles() {
     return Roles::instance();
 }
-
-/**
- *
- * Role
- * @param [type] $role_slug
- * @return void
- */
-/* function role( $role_slug ) {
-    Roles::get_role( $role_slug );
-}
- */

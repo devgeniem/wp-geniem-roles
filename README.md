@@ -1,13 +1,22 @@
 # Geniem Roles
-Wrapper classes for WordPress role creation and editing.
+Wrapper classes for developers for WordPress role creation and editing.
 
 ## Installation
-Move file geniem-roles.php to WordPress mu-plugins folder.
-Create file to your theme where you call wrapper class functions. See the examples from below.
+Move plugin to your WordPress installation `plugins/` folder.
 
 ## Composer installation
+command line
 ```
-require devgeniem/wp-geniem-roles
+composer require devgeniem/wp-geniem-roles
+```
+composer.json
+```json
+...
+"require": {
+    "devgeniem/wp-geniem-roles": "^0.1.0",
+    ...
+}
+...
 ```
 
 ## Examples
@@ -24,16 +33,16 @@ All new roles capabilities defaults to `false`. So we add just capabilities that
 // Init Geniem\Roles
 $roles_instance = new \Geniem\Roles();
 
-// Caps to add to the new role
+// Caps to be added to the new role
+// all caps default to false see the details \Geniem\Role::get_default_caps()
 $new_role_caps = array(
     "activate_plugins"              => true,
     "delete_others_pages"           => true,
     "delete_others_posts"           => true
 );
 
-// Create a new role "testrole"
-$new_role = new \Geniem\Role( 'testrole', 'Test role', $new_role_caps );
-
+// Create a new role "testrole" with wanted capabilities
+$new_role = \Geniem\Roles::create( 'new_role', __( 'New role', 'theme-text-domain' ), $new_role_caps );
 
 // Check if role throws a WordPress error
 if ( is_wp_error( $new_role ) ) {
@@ -41,7 +50,26 @@ if ( is_wp_error( $new_role ) ) {
 }
 ```
 
-### Remove caps from role
+### Get and manipulate a role
+You can call existing role from WordPress by calling function `\Geniem\Roles::get( $role_slug );`. You can use a role as an object to manipulate the role. See the example from the below.
+
+```php
+// creates a instace of \Geniem\Role
+$admin = \Geniem\Roles::get( 'administrator' );
+```
+
+### Add caps for a role
+```php
+// Define desired capabilities for a role 'administrator'
+$admin_caps = [
+    'geniem_roles'
+];
+
+// add_caps takes an array off capabilities
+$admin->add_caps( $admin_caps );
+```
+
+### Remove caps from a role
 ```php
 // Define removable caps in an array
 $admin_removable_caps = [
@@ -54,28 +82,15 @@ $admin_removable_caps = [
 $roles_instance::remove_caps( 'administrator', $admin_removable_caps );
 ```
 
-### Add caps for role
+### Grant super admin cap for a single user
 ```php
-// Define removable caps in an array
-$admin_add_caps = [
-    'edit_users',
-    'delete_users',
-    'create_users'
-];
-
-// Run function remove_caps for desired wp role
-$roles_instance::add_caps( 'administrator', $admin_add_caps );
-```
-
-### Grant super admin cap for a user
-```php
-$roles_instance::grant_super_admin_cap( 1 );
+\Geniem\Roles::grant_super_admin_cap( 1 );
 ```
 
 ### Remove menu pages by role
-You can remove single admin menu page with `string` value or multiple pages with `array` value.
+You can remove single admin menu page with `string` value or multiple pages with an `array` value.
 
-```
+```php
 // Removable admin pages array
 $admin_removable_admin_pages = [
     'edit.php', // posts
@@ -83,16 +98,13 @@ $admin_removable_admin_pages = [
 ];
 
 // Remove multiple menu pages remove_role_menu_pages( $role_slug, $menu_pages )
-$roles::remove_role_menu_pages( 'administrator', $admin_removable_admin_pages );
-
-// Remove single menu page
-$roles::remove_role_menu_pages( 'administrator', 'edit.php' );
+$admin->remove_menu_pages( $admin_removable_admin_pages );
 ```
 
 ### Remove submenu pages by role and parent page
 You can remove single admin submenu page with `string` value or multiple pages with `array` value.
 
-```
+```php
 // An array of removable submenu pages
 $admin_removable_submenu_pages = [
     'nav-menus.php'
@@ -104,6 +116,3 @@ $roles::remove_role_submenu_pages( 'administrator', 'themes.php', $admin_removab
 // Remove single submenu page
 $roles::remove_role_submenu_pages( 'administrator', 'themes.php', 'nav-menus.php' );
 ```
-
-TODO
-### Translations
