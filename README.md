@@ -96,7 +96,10 @@ $admin = \Geniem\Roles::get( 'administrator' );
 ```php
 // Remove a role
 $author = \Geniem\Roles::get( 'author' );
-$author->remove();
+// Check if the role object wasn't null
+if ( $author !== null ) {
+    $author->remove();
+}
 ```
 
 ```php
