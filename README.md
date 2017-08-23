@@ -91,7 +91,20 @@ You can remove single admin menu page with `string` value or multiple pages with
 ```php
 // Get a role
 $admin = \Geniem\Roles::get( 'administrator' );
+```
 
+```php
+// Remove a role
+$author = \Geniem\Roles::get( 'author' );
+$author->remove();
+```
+
+```php
+// Rename a role
+$author->rename( 'new_slug', 'New Name' );
+```
+
+```php
 // Define removable admin pages array
 $admin_removable_admin_pages = [
     'edit.php', // posts
@@ -124,7 +137,7 @@ $admin->remove_submenu_pages( 'administrator', 'themes.php', $admin_removable_su
 ### Filter new role default capabilities
 `apply_filters( 'geniem/roles/default_roles', $defaults );`
 
-### Admin side role listing
+## Admin page role listing
 `wp-geniem-roles` creates a admin page which lists all current active roles and their capabilities in the admin side. Admin page can be seen for roles that can `can_activate_plugins`.
 
 #### screenshot

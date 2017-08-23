@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.1.3
+ * Version: 0.1.4
  * Author: Timi-Artturi Mäkelä / Geniem Oy
  * Author URI: https://geniem.fi
  **/
@@ -81,9 +81,6 @@ final class Roles {
     public static function get_current_roles() {
         global $wp_roles;
 
-        // Get all current roles
-        /*$all_roles = array_keys( $wp_roles->roles );*/
-
         return $wp_roles->roles;
     }
 
@@ -130,15 +127,16 @@ final class Roles {
      * @param [type] $new_name
      * @return void
      */
-    public function rename( $slug, $new_name ) {
+    public static function rename( $slug, $new_slug, $new_name ) {
+        global $wp_roles;
 
         if ( ! isset( $wp_roles ) ) {
-            $self::$roles = new WP_Roles();
+            self::$roles = new WP_Roles();
         }
 
         // Rename role
         $wp_roles->roles[$slug]['name']   = $new_name;
-        $wp_roles->role_names[$slug]      = $new_name;
+        $wp_roles->role_names[$slug]      = $new_slug;
     }
 
     /**
@@ -172,7 +170,7 @@ final class Roles {
     public static function remove_caps( $role_slug = '', $caps ) {
 
         if ( ! empty( $role ) || ! empty( $caps ) ) {
-            $role = get( $role_slug );
+            $role = \get_role( $role_slug );
 
             // Remove desired caps from a role.
             if ( is_array( $caps ) && ! empty( $caps ) ) {
@@ -208,8 +206,7 @@ final class Roles {
             return $role;
         }
         else {
-            echo 'no role exists for a role slug: ' . $slug;
-            die();
+            return;
         }
     }
 
@@ -307,7 +304,6 @@ final class Roles {
      */
     public static function add_options_page() {
         if ( is_admin() ) {
-
             // Run in admin_menu hook when called outside class
             add_action( 'admin_menu', function() {
 
@@ -358,7 +354,7 @@ final class Roles {
 
                                 $formated_cap = \str_replace( '_', ' ', $key );
 
-                                if ( ! in_array( $key, $legacy_caps ) ) {
+                                if ( ! in_array( $key, $legacy_caps ) && $value !== false ) {
                                     echo '<li>' . $formated_cap . '</li>';
                                 }
                             }
@@ -477,9 +473,6 @@ class Role {
             'remove_users'              => false,
             'switch_themes'             => false,
             'upload_files'              => false,
-
-            // Geniem Roles
-            'geniem_roles'              => false,
         );
 
         // filter default caps
@@ -545,6 +538,18 @@ class Role {
     }
 
     /**
+     * Remove capabilities for a role
+     * Makes db changes do not run everytime.
+     *
+     * @param [type] $role_slug
+     * @param [type] $cap
+     * @return void
+     */
+    public function remove_caps( $caps ) {
+        Roles::remove_caps( $this->slug, $caps );
+    }
+
+    /**
      * Get all caps for by role.
      *
      * @param [type] $slug
@@ -552,6 +557,27 @@ class Role {
      */
     public function get_caps( $slug ) {
         return get_role( $slug )->capabilities;
+    }
+
+    /**
+     * Remove role
+     *
+     * @param [type] $slug
+     * @return void
+     */
+    public function remove_role( $slug ) {
+        return Roles::remove_role( $this->slug );
+    }
+
+    /**
+     * Rename a role
+     *
+     * @param [type] $slug
+     * @param [type] $name
+     * @return void
+     */
+    public function rename( $new_slug, $new_name ) {
+        return Roles::rename( $this->slug, $new_slug, $new_name );
     }
 }
 
