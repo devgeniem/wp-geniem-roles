@@ -3,8 +3,8 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.1.4
- * Author: Timi-Artturi Mäkelä / Geniem Oy
+ * Version: 0.2.0
+ * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Geniem Oy
  * Author URI: https://geniem.fi
  **/
 
@@ -16,19 +16,19 @@ namespace Geniem;
 final class Roles {
 
     /**
-     * Roles
+     * Roles.
      * @var [type]
      */
     protected static $roles;
 
     /**
-     * Singleton Geniem Roles instance
+     * Singleton Geniem Roles instance.
      * @var [type]
      */
     private static $instance;
 
     /**
-     * Init roles singletone
+     * Init roles singleton.
      */
     public static function instance() {
         if ( ! isset( self::$instance ) ) {
@@ -41,9 +41,6 @@ final class Roles {
      * Roles __constuctor
      */
     public function __construct() {
-
-        // Get all current roles
-        self::$roles = self::get_current_roles();
 
         // Actions
         add_action( 'init', array( __CLASS__, 'init' ) );
@@ -60,7 +57,7 @@ final class Roles {
     public static function geniem_roles_styles( $hook ) {
 
         // Skip enqueue geniem-roles-styles if not on wp-geniem-roles menu page
-        if ( 'toplevel_page_wp-geniem-roles' != $hook ) { return; }
+        if ( 'toplevel_page_wp-geniem-roles' !== $hook ) { return; }
 
         wp_enqueue_style( 'geniem_roles_styles', plugin_dir_url( __FILE__ ) . 'geniem-roles-styles.css', false, '1.0.6' );
     }
@@ -72,51 +69,82 @@ final class Roles {
      */
     public static function init() {
         // Do the code.
-
+        self::load_current_roles();
     }
 
     /**
-     * Returns all active roles
+     * Loads all active roles
      */
-    public static function get_current_roles() {
+    public static function load_current_roles() {
+        // Get global wp_roles containing roles, role_objects and role_names.
         global $wp_roles;
 
-        return $wp_roles->roles;
+        // Loop through existing role_objects.
+        foreach ( $wp_roles->role_objects as $role ) {
+            $display_name = '';
+            // Loop through role_names table to get display name.
+            foreach ( $wp_roles->role_names as $key => $value ) {
+                if( $key === $role->name ) {
+                    $display_name = $value;
+                }
+            }
+            // Create Role instance.
+            self::$roles[ $role->name ] = new Role( $role->name, $display_name );
+        }
+    }
+
+    /**
+     * Returns role instances created from active roles.
+     *
+     * @return array $roles;
+     */
+    public static function get_roles() {
+        $roles = self::$roles;
+        return $roles;
     }
 
     /**
      * Create new roles
-     * @param string $slug
-     * @param $name
+     *
+     * @param string  $name
+     * @param string  $display_name Translated later
      * @param boolean $caps
      */
-    public static function create( $slug, $name, $caps ) {
+    public static function create( $name, $display_name, $caps ) {
 
-        // If role already exists return WP_Error
-        if ( in_array( $slug, self::$roles, true ) ) {
-            new \WP_Error( 409, __( 'Role already exists!', 'geniem-roles' ) );
+        // If role already exists return it
+        if ( self::role_exists( $name ) ) {
+            $role = self::$roles[ $name ];
+            return $role;
         }
         else {
-            // merge capabilities
-            $caps = array_merge( Role::get_default_caps(), $caps );
+            // Merge capabilities.
+            $caps = \wp_parse_args( $caps, Role::get_default_caps() );
 
-            // add roles
-            // Todo: how to handle translations
-            add_role( $slug, __( $name ), $caps );
+            // Add role.
+            \add_role( $name, $display_name, $caps );
 
-            return new Role( $slug, $name, $caps );
+            $role_instance = new Role( $name, $display_name );
+            return $role_instance;
         }
     }
-
+    /**
+     * Check if role exists.
+     */
+    public static function role_exists( $slug ) {
+        $role = \get_role( $slug );
+        return $role !== null;
+    }
     /**
      * Remove roles.
-     * @param string $slug
+     * @param string $name
      */
-    public static function remove_role( $slug ) {
+    public static function remove_role( $name ) {
 
         // If role exists remove role
-        if ( array_key_exists( $slug, self::$roles ) ) {
-            remove_role( $slug );
+        if ( self::role_exists( $name ) ) {
+            remove_role( $name );
+            unset( self::$roles[ $name ] );
         }
     }
 
@@ -127,7 +155,7 @@ final class Roles {
      * @param [type] $new_name
      * @return void
      */
-    public static function rename( $slug, $new_slug, $new_name ) {
+    public static function rename( $slug, $new_name ) {
         global $wp_roles;
 
         if ( ! isset( $wp_roles ) ) {
@@ -136,7 +164,6 @@ final class Roles {
 
         // Rename role
         $wp_roles->roles[$slug]['name']   = $new_name;
-        $wp_roles->role_names[$slug]      = $new_slug;
     }
 
     /**
@@ -186,16 +213,18 @@ final class Roles {
     }
 
     /**
-     * If role exists return the role
+     * If role exists return the role else returns false.
      * insert int or string
-     * 
+     *
      * @param string $slug
      */
     public static function get( $slug ) {
 
         // Get from cache
         if ( isset( self::$roles[ $slug ] ) ) {
-
+            return self::$roles[ $slug ];
+        }
+        else {
             // Variables
             $name   = self::$roles[ $slug ]['name'];
             $cap    = self::$roles[ $slug ]['capabilities'];
@@ -205,14 +234,11 @@ final class Roles {
 
             return $role;
         }
-        else {
-            return;
-        }
     }
 
     /**
      * Remove menu pages from a role.
-     * 
+     *
      * @param string $role_slug
      * @param string $menu_page
      * @return void
@@ -344,22 +370,22 @@ final class Roles {
                 // Single role wrap
                 echo '<div class="geniem-roles__single-role">';
 
-                    // Name
-                    echo '<h2>' . $role['name'] . '</h2>';
+                // Name
+                echo '<h2>' . $role->display_name . '</h2>';
 
-                    // Caps
-                    echo '<ul>';
-                        if ( ! empty( $role['capabilities'] ) ) {
-                            foreach ( $role['capabilities'] as $key => $value ) {
+                // Caps
+                echo '<ul>';
+                if ( ! empty( $role->capabilities ) ) {
+                    foreach ( $role->capabilities as $key => $value ) {
 
-                                $formated_cap = \str_replace( '_', ' ', $key );
+                        $formated_cap = \str_replace( '_', ' ', $key );
 
-                                if ( ! in_array( $key, $legacy_caps ) && $value !== false ) {
-                                    echo '<li>' . $formated_cap . '</li>';
-                                }
-                            }
+                        if ( ! in_array( $key, $legacy_caps ) && $value !== false ) {
+                            echo '<li>' . $formated_cap . '</li>';
                         }
-                    echo '</ul>';
+                    }
+                }
+                echo '</ul>';
                 echo '</div>'; // geniem-roles__single-role
 
             } // foreach ends
@@ -382,6 +408,66 @@ final class Roles {
         }
     }
 
+    /**
+     * Block post edit view from a role by blocked_post_ids array
+     *
+     * @param [type] $blocked_post_ids or slugs
+     * @param [type] $blocked_roles
+     * @return void
+     */
+    public static function restrict_post_edit( $role_slug, $blocked_posts ) {
+
+        // TODO
+        // Vertaile onko blocked_posts int vai string
+        // Tee käsittelyt slugille ja post id:lle
+
+
+        // In admin side
+        if ( is_admin() ) {
+
+            // Run in admin_notices hook when called outside class
+            add_action( 'admin_notices', function() use ( $role_slug, $blocked_posts ) {
+                // Variables
+                global $pagenow;
+
+                // If editing post or page
+                if ( $pagenow === 'post.php' ) {
+
+                    global $post;
+
+                    // Add filter to this
+                    $redirect_url       = admin_url();
+                    $current_user       = wp_get_current_user();
+                    $current_user_roles = $current_user->roles;
+
+                    /**
+                     * TODO
+                     * disabloi sivujen ja artikkelien listauksista blockatut sivut
+                     */
+
+                    // Just to be sure
+                    if ( ! empty( $blocked_posts ) && ! empty( $current_user_roles ) ) {
+
+                        // If edited page id is blocked and current user has a role that is blocked
+                        if ( in_array( $post->ID, $blocked_posts ) && in_array( $role_slug, $current_user_roles ) ) {
+                            // Redirect to admin frontpage
+                            // Palaa adminin etusivulle ja antaa WP errorlaatikossa viestin et voi muokata
+                            wp_redirect( $redirect_url );
+                        }
+                        // return empty
+                        else {
+                            return;
+                        }
+                    }
+                    else {
+                        return;
+                    }
+                }
+
+            }); // add_action
+        } // End if.
+    }
+
     /*
      * Filters gettext_with_context
      */
@@ -396,14 +482,15 @@ final class Roles {
 class Role {
 
     /**
-     * Role slug
-     */
-    public $slug;
-
-    /**
-     * Name slug
+     * Role name
      */
     public $name;
+
+    /**
+     * Role display name
+     */
+    public $display_name;
+
 
     /**
      * Capabilities
@@ -459,12 +546,10 @@ class Role {
             'edit_theme_options'        => false,
             'export'                    => false,
             'import'                    => false,
-            'list_users'                => false,
             'manage_categories'         => false,
             'manage_links'              => false,
             'manage_options'            => false,
             'moderate_comments'         => false,
-            'promote_users'             => false,
             'publish_pages'             => false,
             'publish_posts'             => false,
             'read_private_pages'        => false,
@@ -480,20 +565,27 @@ class Role {
     }
 
     /**
-     * Constructor
+     * Role constructor.
+     *
+     * @param      $slug
+     * @param null $name
+     * @param string $display_name
      */
-    public function __construct( $slug, $name = null, $defaults = null ) {
-
-        if ( ! $defaults ) {
-            $defaults = self::get_default_caps();
+    public function __construct( $name, $display_name ) {
+        $role       = \get_role( $name );
+        // Get role
+        if ( $role ) {
+            // Set values.
+            $this->capabilities = $role->capabilities;
+            $this->name         = $role->name;
+            $this->display_name = $display_name;
         }
-
-        // set values
-        $this->slug         = $slug;
-        $this->name         = $name;
-        $this->capabilities = $defaults;
-
-        add_action( 'admin_init', __NAMESPACE__ . '\Roles::init' );
+        // Create new role
+        else {
+            $this->capabilities = self::get_default_caps();
+            $this->name = $name;
+            $this->display_name = $display_name;
+        }
     }
 
     /**
@@ -502,7 +594,7 @@ class Role {
      * @return void
      */
     public function remove() {
-        Roles::remove_role( $this->slug );
+        Roles::remove_role( $this->name );
     }
 
     /**
@@ -512,7 +604,7 @@ class Role {
      * @return void
      */
     public function remove_menu_pages( $menu_pages ) {
-        Roles::remove_menu_pages( $this->slug, $menu_pages );
+        Roles::remove_menu_pages( $this->name, $menu_pages );
     }
 
     /**
@@ -522,7 +614,7 @@ class Role {
      * @return void
      */
     public function remove_submenu_pages( $parent_slug, $menu_pages ) {
-        Roles::remove_submenu_pages( $this->slug, $parent_slug, $menu_pages );
+        Roles::remove_submenu_pages( $this->name, $parent_slug, $menu_pages );
     }
 
     /**
@@ -534,7 +626,7 @@ class Role {
      * @return void
      */
     public function add_caps( $caps ) {
-        Roles::add_caps( $this->slug, $caps );
+        Roles::add_caps( $this->name, $caps );
     }
 
     /**
@@ -546,7 +638,7 @@ class Role {
      * @return void
      */
     public function remove_caps( $caps ) {
-        Roles::remove_caps( $this->slug, $caps );
+        Roles::remove_caps( $this->name, $caps );
     }
 
     /**
@@ -566,7 +658,7 @@ class Role {
      * @return void
      */
     public function remove_role( $slug ) {
-        return Roles::remove_role( $this->slug );
+        return Roles::remove_role( $this->name );
     }
 
     /**
@@ -576,9 +668,21 @@ class Role {
      * @param [type] $name
      * @return void
      */
-    public function rename( $new_slug, $new_name ) {
-        return Roles::rename( $this->slug, $new_slug, $new_name );
+    public function rename( $new_display_name ) {
+        return Roles::rename( $this->name, $new_display_name );
     }
+
+    /**
+     * Block post edit view by post ids
+     *
+     * @param [type] $slug
+     * @param [type] $name
+     * @return void
+     */
+    public function restrict_post_edit( $blocked_posts ) {
+        return Roles::restrict_post_edit( $this->name, $blocked_posts );
+    }
+
 }
 
 /**
