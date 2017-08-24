@@ -400,80 +400,53 @@ final class Roles {
     public function role( $role_slug ) {
         $current_roles = self::$roles;
 
-        // Foreach
         foreach ( $current_roles as $key => $value ) {
-            if ( $key == $role_slug ) {
+            if ( $key === $role_slug ) {
                 return $value;
             }
         }
     }
 
     /**
-     * Block post edit view from a role by blocked_post_ids array
+     * Add function to map_meta_cap which disallows certain actions for role in specifed posts.
      *
-     * @param [type] $blocked_post_ids or slugs
-     * @param [type] $blocked_roles
-     * @return void
+     * @param string $role_slug Role slug
+     * @param array  $blocked_posts
+     * @param string $capability
      */
-    public static function restrict_post_edit( $role_slug, $blocked_posts ) {
-
+    public static function restrict_post_edit( $role_slug, $blocked_posts, $capability = 'edit_post' ) {
         // TODO
         // Vertaile onko blocked_posts int vai string
         // Tee käsittelyt slugille ja post id:lle
-
-
-        // In admin side
-        if ( is_admin() ) {
-
-            // Run in admin_notices hook when called outside class
-            add_action( 'admin_notices', function() use ( $role_slug, $blocked_posts ) {
-                // Variables
-                global $pagenow;
-
-                // If editing post or page
-                if ( $pagenow === 'post.php' ) {
-
-                    global $post;
-
-                    // Add filter to this
-                    $redirect_url       = admin_url();
-                    $current_user       = wp_get_current_user();
-                    $current_user_roles = $current_user->roles;
-
-                    /**
-                     * TODO
-                     * disabloi sivujen ja artikkelien listauksista blockatut sivut
-                     */
-
-                    // Just to be sure
-                    if ( ! empty( $blocked_posts ) && ! empty( $current_user_roles ) ) {
-
-                        // If edited page id is blocked and current user has a role that is blocked
-                        if ( in_array( $post->ID, $blocked_posts ) && in_array( $role_slug, $current_user_roles ) ) {
-                            // Redirect to admin frontpage
-                            // Palaa adminin etusivulle ja antaa WP errorlaatikossa viestin et voi muokata
-                            wp_redirect( $redirect_url );
-                        }
-                        // return empty
-                        else {
-                            return;
-                        }
-                    }
-                    else {
-                        return;
-                    }
+        $current_user = wp_get_current_user();
+        // TODO
+        // Add filter
+        $current_user_roles = $current_user->roles;
+        // Add function to map_meta_cap which disallows certain actions for role in specifed posts.
+        // Check if we need to restrict current user.
+        if ( in_array( $role_slug, $current_user_roles, true ) ) {
+            /**
+             * Map_meta_cap arguments.
+             * $caps (array) Returns the user's actual capabilities.
+             * $cap (string) Capability name.
+             * $user_id (int) The user ID.
+             * $args (array) Adds the context to the cap. Typically the object ID.
+             */
+            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $blocked_posts, $role_slug, $capability ) {
+                // $args[0] is the post id.
+                if ( $cap === $capability && in_array( $args[ 0 ], $blocked_posts, true ) ) {
+                    // This is default Wordpress way to restrict access.
+                    $caps[] = 'do_not_allow';
                 }
-
-            }); // add_action
-        } // End if.
+                return $caps;
+            }, 10, 4 );
+        }
     }
-
     /*
      * Filters gettext_with_context
      */
     /* public function translate_role_names() {
     } */
-
 }
 
 /**
@@ -679,8 +652,8 @@ class Role {
      * @param [type] $name
      * @return void
      */
-    public function restrict_post_edit( $blocked_posts ) {
-        return Roles::restrict_post_edit( $this->name, $blocked_posts );
+    public function restrict_post_edit( $blocked_posts, $capability ) {
+        return Roles::restrict_post_edit( $this->name, $blocked_posts, $capability);
     }
 
 }
