@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.2.0
+ * Version: 0.2.2
  * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Geniem Oy
  * Author URI: https://geniem.fi
  **/
@@ -414,7 +414,7 @@ final class Roles {
      * @param array  $blocked_posts
      * @param string $capability
      */
-    public static function restrict_post_edit( $role_slug, $blocked_posts, $capability = 'edit_post' ) {
+    public static function restrict_post_edit( $role_slug, $blocked_posts, $capability ) {
         // TODO
         // Vertaile onko blocked_posts int vai string
         // Tee käsittelyt slugille ja post id:lle

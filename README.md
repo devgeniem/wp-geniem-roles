@@ -118,6 +118,41 @@ $admin_removable_admin_pages = [
 $admin->remove_menu_pages( $admin_removable_admin_pages );
 ```
 
+
+### Restrict post editing and deleting
+This function makes easy and fast to restrict editing of certain posts. Pass restricted post as an array of post ids and choose which capabilities you want to restrict for them.
+
+```php
+/**
+* All possible restricted capabilities are listed below
+* https://codex.wordpress.org/Function_Reference/map_meta_cap
+*/
+'delete_page'
+'delete_post'
+'delete_user'
+'edit_comment' (3.1. Mapped to 'edit_post' meta capability.)
+'edit_page'
+'edit_post'
+'edit_user'
+'publish_post' (3.5)
+'promote_user'
+'read_post'
+'read_page'
+'remove_user'
+```
+
+```php
+// Define restricted post IDs
+$frontpage_id = get_option( 'page_on_front' );
+
+$blocked_posts = [
+    $frontpage_id,
+    2
+];
+
+$admin->restrict_post_edit( $blocked_posts, $capability );
+```
+
 ### Remove submenu pages from a role
 You can remove single admin submenu page with `string` value or multiple pages with `array` value.
 
