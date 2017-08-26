@@ -414,10 +414,37 @@ final class Roles {
      * @param array  $blocked_posts
      * @param string $capability
      */
-    public static function restrict_post_edit( $role_slug, $blocked_posts, $capability ) {
-        // TODO
-        // Vertaile onko blocked_posts int vai string
-        // Tee käsittelyt slugille ja post id:lle
+    public static function restrict_post_edit( $role_slug, $blocked_posts, $capability, $post_type ) {
+
+        // If parameter post_type is empty skip slug
+        if ( ! empty( $post_type ) ) {
+
+            $array_items_type = self::check_array_type( $blocked_posts );
+
+            // If all items are already integers do not get post id:s by slug
+            if ( $array_items_type !== 'int' ) {
+
+                // Get post ids for slugs also handle the post type
+                foreach ( $blocked_posts as $key => &$post ) {
+                    
+                    // If string
+                    if ( is_string( $post ) ) {
+                        // For custom post type we need to know the post_type
+                        $post_object = \get_page_by_path( $post, OBJECT, $post_type );
+                        
+                        // if object
+                        if ( \is_object( $post_object ) ) {
+                            $post = $post_object->ID;
+                        }
+                        // If not an object remove item from an array.
+                        else {
+                            unset( $blocked_posts[$key] );
+                        }
+                    }
+                }
+            }
+        }
+
         $current_user = wp_get_current_user();
         // TODO
         // Add filter
@@ -432,7 +459,8 @@ final class Roles {
              * $user_id (int) The user ID.
              * $args (array) Adds the context to the cap. Typically the object ID.
              */
-            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $blocked_posts, $role_slug, $capability ) {
+            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $role_slug, $blocked_posts, $capability ) {
+                
                 // $args[0] is the post id.
                 if ( $cap === $capability && in_array( $args[ 0 ], $blocked_posts, true ) ) {
                     // This is default Wordpress way to restrict access.
@@ -442,8 +470,30 @@ final class Roles {
             }, 10, 4 );
         }
     }
+
+    /**
+     * Checks type of all array items
+     *
+     * @param [type] $array
+     * @return string
+     */
+    public static function check_array_type( $array ) {
+        $array = array_map( "is_int", $array );
+        if ( in_array( true, $array ) && in_array( false, $array ) ) {
+            return 'mixed';
+        }
+        // int only
+        elseif ( in_array( true, $array ) ) {
+            return 'int';
+        }
+        // all strings
+        else {
+            return 'string';
+        }
+    }
+
     /*
-     * Filters gettext_with_context
+     * TODO: Filters gettext_with_context
      */
     /* public function translate_role_names() {
     } */
@@ -652,8 +702,8 @@ class Role {
      * @param [type] $name
      * @return void
      */
-    public function restrict_post_edit( $blocked_posts, $capability ) {
-        return Roles::restrict_post_edit( $this->name, $blocked_posts, $capability);
+    public function restrict_post_edit( $blocked_posts, $capability, $post_type = '' ) {
+        return Roles::restrict_post_edit( $this->name, $blocked_posts, $capability, $post_type );
     }
 
 }

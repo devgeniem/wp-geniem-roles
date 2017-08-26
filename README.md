@@ -124,7 +124,7 @@ This function makes easy and fast to restrict editing of certain posts. Pass res
 
 ```php
 /**
-* All possible restricted capabilities are listed below
+* All possible restricted capabilities are listed below for fast copy paste
 * https://codex.wordpress.org/Function_Reference/map_meta_cap
 */
 'delete_page'
@@ -142,16 +142,31 @@ This function makes easy and fast to restrict editing of certain posts. Pass res
 ```
 
 ```php
-// Define restricted post IDs
+// Define restricted post IDs or slugs 
 $frontpage_id = get_option( 'page_on_front' );
 
 $blocked_posts = [
-    $frontpage_id,
+    (int)$frontpage_id, // Function returns id as a string so we cast it to int
     2
 ];
+$post_type = 'page';
+$post_type = 'edit_page';
 
-$admin->restrict_post_edit( $blocked_posts, $capability );
+$admin->restrict_post_edit( $blocked_posts, $capability, $post_type );
 ```
+Parameters
+$blocked_posts
+    (int, string or mixed) (required)
+    Default: None
+
+$capability
+    (int, string or mixed) (required)
+    Default: None
+
+$post_type
+    Use only if $blocked_posts values are type of string or mixed
+    (int, string or mixed) (optional)
+    Default: None
 
 ### Remove submenu pages from a role
 You can remove single admin submenu page with `string` value or multiple pages with `array` value.
