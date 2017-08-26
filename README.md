@@ -153,6 +153,8 @@ $post_type = 'page';
 $post_type = 'edit_page';
 
 $admin->restrict_post_edit( $blocked_posts, $capability, $post_type );
+```
+```
 Parameters
 $blocked_posts
     (int, string or mixed) (required)
