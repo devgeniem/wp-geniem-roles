@@ -153,7 +153,6 @@ $post_type = 'page';
 $post_type = 'edit_page';
 
 $admin->restrict_post_edit( $blocked_posts, $capability, $post_type );
-```
 Parameters
 $blocked_posts
     (int, string or mixed) (required)
@@ -167,6 +166,8 @@ $post_type
     Use only if $blocked_posts values are type of string or mixed
     (int, string or mixed) (optional)
     Default: None
+```
+
 
 ### Remove submenu pages from a role
 You can remove single admin submenu page with `string` value or multiple pages with `array` value.
