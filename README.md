@@ -122,25 +122,7 @@ $admin->remove_menu_pages( $admin_removable_admin_pages );
 ### Restrict post editing and deleting
 This function makes easy and fast to restrict editing of certain posts. Pass restricted post as an array of post ids and choose which capabilities you want to restrict for them.
 
-```php
-/**
-* All possible restricted capabilities are listed below for fast copy paste
-* https://codex.wordpress.org/Function_Reference/map_meta_cap
-*/
-'delete_page'
-'delete_post'
-'delete_user'
-'edit_comment' (3.1. Mapped to 'edit_post' meta capability.)
-'edit_page'
-'edit_post'
-'edit_user'
-'publish_post' (3.5)
-'promote_user'
-'read_post'
-'read_page'
-'remove_user'
-```
-
+#### Example
 ```php
 // Define restricted post IDs or slugs 
 $frontpage_id = get_option( 'page_on_front' );
@@ -154,14 +136,27 @@ $post_type = 'edit_page';
 
 $admin->restrict_post_edit( $blocked_posts, $capability, $post_type );
 ```
+#### Parameters
 ```
-Parameters
 $blocked_posts
     (int, string or mixed) (required)
     Default: None
 
 $capability
     (int, string or mixed) (required)
+     // All possible restricted capabilities are listed below for fast copy paste
+    'delete_page'
+    'delete_post'
+    'delete_user'
+    'edit_comment' (3.1. Mapped to 'edit_post' meta capability.)
+    'edit_page'
+    'edit_post'
+    'edit_user'
+    'publish_post' (3.5)
+    'promote_user'
+    'read_post'
+    'read_page'
+    'remove_user'
     Default: None
 
 $post_type
