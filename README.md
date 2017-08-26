@@ -124,6 +124,9 @@ This function makes easy and fast to restrict editing of certain posts. Pass res
 
 #### Example
 ```php
+<?php
+...
+
 // Define restricted post IDs or slugs 
 $frontpage_id = get_option( 'page_on_front' );
 
