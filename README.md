@@ -108,10 +108,17 @@ $author->rename( 'new_slug', 'New Name' );
 ```
 
 ```php
-// Define removable admin pages array
+/**
+ * Define removable admin pages array
+ *
+ * note: Most of the plugins can be removed by plugin page slug.
+ * Plugin page slug can be found from the plugin admin page in the get parameter page example: admin.php?page=plugin_page_slug
+ */
 $admin_removable_admin_pages = [
-    'edit.php', // posts
-    'edit.php?post_type=page' //  pages
+    'edit.php',                             // Posts
+    'edit.php?post_type=page',              // Pages
+    'edit.php?post_type=acf-field-group'    // Advanced Custom Fields
+    'plugin_page_slug',                     // Remove plugin page by plugin page slug
 ];
 
 // Remove multiple menu pages remove_role_menu_pages( $role_slug, $menu_pages )
