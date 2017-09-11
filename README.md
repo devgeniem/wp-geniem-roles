@@ -163,9 +163,9 @@ $capability
     Default: None
 
 $post_type
-    Use only if $blocked_posts values are type of string or mixed
+    Needed only if $blocked_posts values are type of string or mixed
     (int, string or mixed) (optional)
-    Default: None
+    Default: ''
 ```
 
 
