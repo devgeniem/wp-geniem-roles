@@ -51,15 +51,19 @@ final class Roles {
     /**
      * Enqueue styles
      *
-     * @param [type] $hook
+     * @param string $hook Current menu slug.
      * @return void
      */
     public static function geniem_roles_styles( $hook ) {
+        $allowed = [
+            'toplevel_page_wp-geniem-roles',
+            'geniem-roles_page_wp-geniem-roles-slugs',
+        ];
 
         // Skip enqueue geniem-roles-styles if not on wp-geniem-roles menu page
-        if ( 'toplevel_page_wp-geniem-roles' !== $hook ) { return; }
-
-        wp_enqueue_style( 'geniem_roles_styles', plugin_dir_url( __FILE__ ) . 'geniem-roles-styles.css', false, '1.0.6' );
+        if ( in_array( $hook, $allowed ) ) {
+            wp_enqueue_style( 'geniem_roles_styles', plugin_dir_url( __FILE__ ) . 'geniem-roles-styles.css', false, '1.0.6' );
+        }
     }
 
     /**
@@ -342,6 +346,15 @@ final class Roles {
                     'dashicons-universal-access',
                     80
                 );
+
+                \add_submenu_page(
+                    'wp-geniem-roles',                                   // parent menu slug
+                    __( 'Geniem Roles: Menu slugs', 'wp-geniem-roles' ), // page title
+                    __( 'Menu slugs', 'wp-geniem-roles' ),               // menu title
+                    'activate_plugins',                                  // capability
+                    'wp-geniem-roles-slugs',                             // menu slug
+                    array( __CLASS__, 'geniem_roles_slug_html' )         // render function
+                );
             });
         }
     }
@@ -392,6 +405,68 @@ final class Roles {
         }
         echo '</div>';
         echo '<div>'; // wrapper ends
+    }
+
+    public static function geniem_roles_slug_html() {
+        $menu_list = self::get_menu_list();
+
+        echo '<div class="geniem-roles">';
+        echo '<h1 class="dashicons-before dashicons-universal-access"> ' . __( 'Geniem roles', 'geniem-roles' ) . '</h1>';
+        echo '<p>'. __( 'This page lists all admin menu slugs.', 'geniem-roles' ) . '</p>';
+        echo '<div class="geniem-roles__wrapper">';
+        echo '<div class="geniem-roles__slugs">';
+        echo '<table>';
+        foreach ( $menu_list as $menu ) {
+            echo '<tr>';
+            echo '<td>' . $menu->label . '</td>';
+            echo '<td>' . $menu->path . '</td>';
+            echo '</tr>';
+
+            foreach ( $menu->children as $child_menu ) {
+                echo '<tr class="child-menu">';
+                echo '<td>' . $child_menu->label . '</td>';
+                echo '<td>' . $child_menu->path . '</td>';
+                echo '</tr>';
+            }
+        }
+        echo '</table>';
+
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+
+    public static function get_menu_list() {
+        global $menu, $submenu;
+
+        $menu_list = [];
+        foreach ( $menu as $i => $menu_data ) {
+            if ( $menu_data[0] ) {
+                $parent_menu = (object) [
+                    'label' => strip_tags( $menu_data[0] ),
+                    'path' => $menu_data[2],
+                    'children' => [],
+                ];
+
+                $menu_list[ $parent_menu->path ] = $parent_menu;
+            }
+        }
+        foreach ( $submenu as $i => $menu_data ) {
+            if ( array_key_exists( $i, $menu_list ) ) {
+                $sub_menus = array_map( function( $menu ) {
+                    $item = (object) [
+                        'label' => strip_tags( $menu[0] ),
+                        'path' => $menu[2],
+                    ];
+
+                    return $item;
+
+                }, $menu_data);
+                $menu_list[ $i ]->children = $sub_menus;
+            }
+        }
+
+        return $menu_list;
     }
 
     /**
