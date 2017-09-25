@@ -18,6 +18,24 @@
     padding: 1rem;
 }
 
+.geniem-roles__slugs {
+    margin: 1rem;
+    padding: 1rem;
+    background-color: white;
+}
+
+.geniem-roles__slugs table {
+    border-collapse: collapse;
+}
+
+.geniem-roles__slugs td {
+    padding: 0.25rem;
+}
+
+.geniem-roles__slugs .child-menu td:first-child {
+    padding-left: 2rem;
+}
+
 @media ( max-width: 768px ) {
     .geniem-roles__single-role {
         width: 100%;
