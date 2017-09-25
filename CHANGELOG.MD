@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleases
 
+## [0.2.4] - 2017-09-25
+
 ### Added
 - Menu slugs page that lists all admin menu page slugs
 
