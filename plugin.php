@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.2.5
+ * Version: 0.3
  * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Geniem Oy
  * Author URI: https://geniem.fi
  **/
@@ -34,6 +34,7 @@ final class Roles {
         if ( ! isset( self::$instance ) ) {
             self::$instance = new Roles();
         }
+
         return self::$instance;
     }
 
@@ -55,24 +56,25 @@ final class Roles {
      * @return void
      */
     public static function geniem_roles_styles( $hook ) {
+
         $allowed = [
             'toplevel_page_wp-geniem-roles',
             'geniem-roles_page_wp-geniem-roles-slugs',
         ];
 
         // Skip enqueue geniem-roles-styles if not on wp-geniem-roles menu page
-        if ( in_array( $hook, $allowed ) ) {
+        if ( in_array( $hook, $allowed, true ) ) {
             wp_enqueue_style( 'geniem_roles_styles', plugin_dir_url( __FILE__ ) . 'geniem-roles-styles.css', false, '1.0.6' );
         }
     }
 
     /**
-     * Undocumented function
+     * Initialize roles.
      *
      * @return void
      */
     public static function init() {
-        // Do the code.
+        // Init roles.
         self::load_current_roles();
     }
 
@@ -80,15 +82,19 @@ final class Roles {
      * Loads all active roles
      */
     public static function load_current_roles() {
+
         // Get global wp_roles containing roles, role_objects and role_names.
         global $wp_roles;
 
         // Loop through existing role_objects.
         foreach ( $wp_roles->role_objects as $role ) {
+
             $display_name = '';
+
             // Loop through role_names table to get display name.
             foreach ( $wp_roles->role_names as $key => $value ) {
-                if( $key === $role->name ) {
+
+                if ( $key === $role->name ) {
                     $display_name = $value;
                 }
             }
@@ -98,7 +104,7 @@ final class Roles {
     }
 
     /**
-     * Returns role instances created from active roles.
+     * Returns all role instances created from active roles.
      *
      * @return array $roles;
      */
@@ -120,8 +126,7 @@ final class Roles {
         if ( self::role_exists( $name ) ) {
             $role = self::$roles[ $name ];
             return $role;
-        }
-        else {
+        } else {
             // Merge capabilities.
             $caps = \wp_parse_args( $caps, Role::get_default_caps() );
 
@@ -132,22 +137,27 @@ final class Roles {
             return $role_instance;
         }
     }
+
     /**
      * Check if role exists.
+     *
+     * @param string $slug Role slug.
+     * @return null|object $role|null role object or null.
      */
     public static function role_exists( $slug ) {
         $role = \get_role( $slug );
         return $role !== null;
     }
+
     /**
      * Remove roles.
-     * @param string $name
+     * @param string $name Role name.
      */
     public static function remove_role( $name ) {
 
         // If role exists remove role
         if ( self::role_exists( $name ) ) {
-            remove_role( $name );
+            \remove_role( $name );
             unset( self::$roles[ $name ] );
         }
     }
@@ -155,8 +165,8 @@ final class Roles {
     /**
      * Rename a role with new_name
      *
-     * @param [type] $slug
-     * @param [type] $new_name
+     * @param string $slug Role slug.
+     * @param string $new_name New display name for role.
      * @return void
      */
     public static function rename( $slug, $new_name ) {
@@ -198,6 +208,13 @@ final class Roles {
     /**
      * Remove role caps
      */
+    /**
+     * Remove capabilities from a role.
+     *
+     * @param string $role_slug Role slug.
+     * @param array  $caps Array of capabilities to be removed.
+     * @return void
+     */
     public static function remove_caps( $role_slug = '', $caps ) {
 
         if ( ! empty( $role ) || ! empty( $caps ) ) {
@@ -227,8 +244,7 @@ final class Roles {
         // Get from cache
         if ( isset( self::$roles[ $slug ] ) ) {
             return self::$roles[ $slug ];
-        }
-        else {
+        } else {
             // Variables
             $name   = self::$roles[ $slug ]['name'];
             $cap    = self::$roles[ $slug ]['capabilities'];
@@ -287,48 +303,6 @@ final class Roles {
                         return false;
                     }
                 } else {
-                    error_log( 'remove_role_menu_pages called without valid $menu_pages' );
-                }
-            }
-        });
-    }
-
-    /**
-     * Remove submenu pages by parent_slug and role.
-     * Remove_menu_pages can also remove submenu pages with associative array.
-     *
-     * @param [type] $role_slug
-     * @param [type] $parent_slug
-     * @param [type] $menu_pages
-     * @return void
-     */
-    public static function remove_submenu_pages( $role_slug = '', $parent_slug = '', $menu_pages = null ) {
-
-        // Run in admin_menu hook when called outside class
-        add_action( 'admin_init', function() use ( $role_slug, $parent_slug, $menu_pages ) {
-
-            // user object
-            $user = wp_get_current_user();
-
-            // remove submenu pages by role
-            // Note: have to check if not doing ajax to avoid errors in admin_init hook
-            if ( in_array( $role_slug, $user->roles, true ) && ! wp_doing_ajax() ) {
-
-                if ( ! empty( $menu_pages ) ) {
-
-                    // if multiple menu pages in array
-                    if ( is_array( $menu_pages ) && ! empty( $menu_pages ) ) {
-                        foreach ( $menu_pages as $menu_page ) {
-                            remove_submenu_page( $parent_slug, $menu_page );
-                        }
-                    }
-                    // If not array remove page by slug
-                    else {
-                        remove_submenu_page( $parent_slug, $menu_pages );
-                    }
-
-                }
-                else {
                     error_log( 'remove_role_menu_pages called without valid $menu_pages' );
                 }
             }
@@ -662,17 +636,6 @@ class Role {
      */
     public function remove_menu_pages( $menu_pages ) {
         Roles::remove_menu_pages( $this->name, $menu_pages );
-    }
-
-    /**
-     * Remove menu pages
-     *
-     * @param array $parent_slug Parent menu item slug.
-     * @param array $menu_pages Array of strings to remove submenu pages.
-     * @return void
-     */
-    public function remove_submenu_pages( $parent_slug, $menu_pages ) {
-        Roles::remove_submenu_pages( $this->name, $parent_slug, $menu_pages );
     }
 
     /**

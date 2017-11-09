@@ -1,9 +1,6 @@
 # Geniem Roles
 Wrapper classes for developers to create and manipulate WordPress roles.
 
-## Installation
-Move plugin to your WordPress installation `plugins/` folder.
-
 ## Composer installation
 command line
 ```
@@ -19,16 +16,19 @@ composer.json
 ...
 ```
 
-## Examples
+## Manual installation
+Move plugin to your WordPress installation `plugins/` folder.
 
-### Initializing Geniem Roles
+# Examples
+
+## Initializing Geniem Roles
 First init \Geniem\Roles singleton by running a function `\Geniem\roles();`
 ```php
 // Init Geniem\Roles singleton
 \Geniem\roles();
 ```
 
-### Create a new role with capabilities
+## Create a new role with capabilities
 All new roles capabilities defaults to `false`. So we add just capabilities that we want to apply for the role. See the example code for a hands on example.
 
 ```php
@@ -53,7 +53,7 @@ if ( is_wp_error( $new_role ) ) {
 }
 ```
 
-### Get and manipulate a role
+## Get and manipulate a role
 You can call existing role from WordPress by calling function `\Geniem\Roles::get( $role_slug );`. You can use a role as an object to manipulate the role. See the example from the below.
 
 ```php
@@ -61,7 +61,7 @@ You can call existing role from WordPress by calling function `\Geniem\Roles::ge
 $admin = \Geniem\Roles::get( 'administrator' );
 ```
 
-### Add caps for a role
+#### Add caps for a role
 ```php
 // Define desired capabilities for a role 'administrator'
 $admin_caps = [
@@ -85,13 +85,6 @@ $admin_removable_caps = [
 $roles_instance::remove_caps( 'administrator', $admin_removable_caps );
 ```
 
-### Get a role.
-Returns wp-geniem-roles role object.
-```php
-// Get a role.
-$admin = \Geniem\Roles::get( 'administrator' );
-```
-
 ### Remove a role.
 ```php
 // Get a role.
@@ -107,13 +100,14 @@ $author->rename( 'new_slug', 'New Name' );
 ```
 
 ### Remove menu pages from a role
-You can remove single admin menu page with `string` value or multiple pages with an `array` value.
+You can remove single admin menu page with `string` value or multiple pages with an `array` value. You can also remove submenu pages. See the example below for the details.
 ```php
 /**
  * Define removable admin pages array
  *
  * note: Most of the plugins can be removed by plugin page slug.
- * Plugin page slug can be found from the plugin admin page in the get parameter page example: admin.php?page=plugin_page_slug
+ * Geniem roles lists all menu slugs in the admin page [Geniem Roles -> Menu slugs].
+ *
  */
 $admin_removable_admin_pages = [
     'edit.php',                             // Posts
@@ -129,7 +123,6 @@ $admin_removable_admin_pages = [
 // Remove multiple menu pages remove_role_menu_pages( $role_slug, $menu_pages )
 $admin->remove_menu_pages( $admin_removable_admin_pages );
 ```
-
 
 ### Restrict post editing and deleting
 This function makes easy and fast to restrict editing of certain posts. Pass restricted post as an array of post ids and choose which capabilities you want to restrict for them.
@@ -165,30 +158,21 @@ $blocked_posts = [
 $admin->restrict_post_edit( $blocked_posts, $capability );
 ```
 
-### Remove submenu pages from a role
-You can remove single admin submenu page with `string` value or multiple pages with `array` value.
-
-```php
-// An array of removable submenu pages
-$admin_removable_submenu_pages = [
-    'nav-menus.php'
-];
-
-// Remove multiple submenu pages remove_role_submenu_pages( $role_slug, $parent_slug, $menu_pages )
-$admin->remove_submenu_pages( 'administrator', 'themes.php', $admin_removable_submenu_pages );
-```
-
 ### Grant super admin cap for a single user
 ```php
 \Geniem\Roles::grant_super_admin_cap( 1 );
 ```
 
-## Filters
-### Filter new role default capabilities
+# Filters
+## Filter new role default capabilities
+By default Geniem Roles defines all capabilities to false if you want to change the default capabilites for a new role use this filter.
 `apply_filters( 'geniem/roles/default_roles', $defaults );`
 
-## Admin page role listing
+# Admin page role listing
 `wp-geniem-roles` creates a admin page which lists all current active roles and their capabilities in the admin side. Admin page can be seen for roles that can `can_activate_plugins`.
 
 #### screenshot
 ![Admin side screenshot](docs/images/screenshot-admin.png)
+
+# Admin page menu slugs
+`wp-geniem-roles` creates a admin page which lists all menu slugs. This is helper page for usage of function `remove_menu_pages()`. See the function documentation for more information.
