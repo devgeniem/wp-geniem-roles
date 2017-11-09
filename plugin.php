@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.2.4
+ * Version: 0.2.5
  * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Geniem Oy
  * Author URI: https://geniem.fi
  **/
@@ -220,7 +220,7 @@ final class Roles {
      * If role exists return the role else returns false.
      * insert int or string
      *
-     * @param string $slug
+     * @param string $slug Role slug.
      */
     public static function get( $slug ) {
 
@@ -242,9 +242,10 @@ final class Roles {
 
     /**
      * Remove menu pages from a role.
+     * note: All menu page slugs can be found from the admin Geniem Roles -> Menu slugs.
      *
-     * @param string $role_slug
-     * @param string $menu_page
+     * @param string $role_slug Role slug.
+     * @param string $menu_pages Menu page slug.
      * @return void
      */
     public static function remove_menu_pages( $role_slug = '', $menu_pages = null ) {
@@ -255,24 +256,37 @@ final class Roles {
             // user object
             $user = wp_get_current_user();
 
-            // remove menu pages by role
-            // Note: have to check if not doing ajax to avoid errors in admin_init hook
+            /**
+             * Remove menu pages by role
+             * Note: Some plugins cannot be removed in admin_menu -hook so we have to do it in admin_init.
+             * In admin_init hook we have to check if not doing ajax to avoid errors.
+             */
             if ( in_array( $role_slug, $user->roles, true ) && ! wp_doing_ajax() ) {
 
                 if ( ! empty( $menu_pages ) ) {
 
-                    // if multiple menu pages in array
+                    // If multiple menu pages in array.
                     if ( is_array( $menu_pages ) && ! empty( $menu_pages ) ) {
-                        foreach ( $menu_pages as $menu_page ) {
-                            remove_menu_page( $menu_page );
-                        }
-                    }
-                    else {
-                        remove_menu_page( $menu_pages );
-                    }
+                        foreach ( $menu_pages as $main_lvl_key => $menu_page ) {
 
-                }
-                else {
+                            // If there are submenu pages to be removed.
+                            if ( is_array( $menu_page ) ) {
+                                foreach ( $menu_page as $submenu_item ) {
+
+                                    \remove_submenu_page( $main_lvl_key, $submenu_item );
+                                }
+                            } else {
+                                \remove_menu_page( $menu_page );
+                            } // End if().
+                        } // End foreach().
+                        // If only one item to be removed.
+                    } elseif ( is_string( $menu_pages ) ) {
+                        \remove_menu_page( $menu_pages );
+                        // Removed menu page isn't valid.
+                    } else {
+                        return false;
+                    }
+                } else {
                     error_log( 'remove_role_menu_pages called without valid $menu_pages' );
                 }
             }
@@ -280,7 +294,8 @@ final class Roles {
     }
 
     /**
-     * Remove submenu pages by parent_slug and role
+     * Remove submenu pages by parent_slug and role.
+     * Remove_menu_pages can also remove submenu pages with associative array.
      *
      * @param [type] $role_slug
      * @param [type] $parent_slug
@@ -323,7 +338,7 @@ final class Roles {
     /**
      * Add a user to the Super admin user list in WordPress Multisite
      *
-     * @return no return
+     * @return No return.
      */
     public static function grant_super_admin_cap( $user_id ) {
         grant_super_admin( $user_id );
@@ -407,6 +422,11 @@ final class Roles {
         echo '<div>'; // wrapper ends
     }
 
+    /**
+     * Geniem roles menu items slug list.
+     *
+     * @return void
+     */
     public static function geniem_roles_slug_html() {
         $menu_list = self::get_menu_list();
 
@@ -470,19 +490,6 @@ final class Roles {
     }
 
     /**
-     * Get role by role slug
-     */
-    public function role( $role_slug ) {
-        $current_roles = self::$roles;
-
-        foreach ( $current_roles as $key => $value ) {
-            if ( $key === $role_slug ) {
-                return $value;
-            }
-        }
-    }
-
-    /**
      * Add function to map_meta_cap which disallows certain actions for role in specifed posts.
      *
      * @param string $role_slug Role slug
@@ -517,11 +524,10 @@ final class Roles {
             }, 10, 4 );
         }
     }
+
     /*
-     * Filters gettext_with_context
+     * TODO: Filters gettext_with_context to translate role names.
      */
-    /* public function translate_role_names() {
-    } */
 }
 
 /**
@@ -615,12 +621,13 @@ class Role {
     /**
      * Role constructor.
      *
-     * @param      $slug
-     * @param null $name
-     * @param string $display_name
+     * @param string $name Role name.
+     * @param string $display_name Display name for the role.
      */
     public function __construct( $name, $display_name ) {
+
         $role       = \get_role( $name );
+
         // Get role
         if ( $role ) {
             // Set values.
@@ -648,7 +655,9 @@ class Role {
     /**
      * Remove menu pages
      *
-     * @param [type] $menu_pages
+     * @param array $menu_pages Mixed array of removable admin menu items.
+     * Array value can be a string or
+     * assoaciative array item 'parent_slug' => [ 'submenu_item1_slug', 'submenu_item2_slug' ].
      * @return void
      */
     public function remove_menu_pages( $menu_pages ) {
@@ -658,7 +667,8 @@ class Role {
     /**
      * Remove menu pages
      *
-     * @param [type] $menu_pages
+     * @param array $parent_slug Parent menu item slug.
+     * @param array $menu_pages Array of strings to remove submenu pages.
      * @return void
      */
     public function remove_submenu_pages( $parent_slug, $menu_pages ) {
@@ -692,7 +702,7 @@ class Role {
     /**
      * Get all caps for by role.
      *
-     * @param [type] $slug
+     * @param string $slug 
      * @return void
      */
     public function get_caps( $slug ) {
@@ -700,20 +710,9 @@ class Role {
     }
 
     /**
-     * Remove role
+     * Rename a role.
      *
-     * @param [type] $slug
-     * @return void
-     */
-    public function remove_role( $slug ) {
-        return Roles::remove_role( $this->name );
-    }
-
-    /**
-     * Rename a role
-     *
-     * @param [type] $slug
-     * @param [type] $name
+     * @param string $new_display_name Display name for a role.
      * @return void
      */
     public function rename( $new_display_name ) {
@@ -723,12 +722,12 @@ class Role {
     /**
      * Block post edit view by post ids
      *
-     * @param [type] $slug
-     * @param [type] $name
+     * @param string $blocked_posts
+     * @param string $capability
      * @return void
      */
     public function restrict_post_edit( $blocked_posts, $capability ) {
-        return Roles::restrict_post_edit( $this->name, $blocked_posts, $capability);
+        return Roles::restrict_post_edit( $this->name, $blocked_posts, $capability );
     }
 
 }

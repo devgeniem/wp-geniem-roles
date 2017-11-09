@@ -85,28 +85,29 @@ $admin_removable_caps = [
 $roles_instance::remove_caps( 'administrator', $admin_removable_caps );
 ```
 
-### Remove menu pages from a role
-You can remove single admin menu page with `string` value or multiple pages with an `array` value.
-
+### Get a role.
+Returns wp-geniem-roles role object.
 ```php
-// Get a role
+// Get a role.
 $admin = \Geniem\Roles::get( 'administrator' );
 ```
 
+### Remove a role.
 ```php
-// Remove a role
+// Get a role.
 $author = \Geniem\Roles::get( 'author' );
-// Check if the role object wasn't null
-if ( $author !== null ) {
-    $author->remove();
-}
+// Remove a role
+$author->remove();
 ```
 
+### Rename a role.
 ```php
 // Rename a role
 $author->rename( 'new_slug', 'New Name' );
 ```
 
+### Remove menu pages from a role
+You can remove single admin menu page with `string` value or multiple pages with an `array` value.
 ```php
 /**
  * Define removable admin pages array
@@ -119,6 +120,10 @@ $admin_removable_admin_pages = [
     'edit.php?post_type=page',              // Pages
     'edit.php?post_type=acf-field-group'    // Advanced Custom Fields
     'plugin_page_slug',                     // Remove plugin page by plugin page slug
+    // You can also remove submenu pages like so.
+    'themes.php' => [
+        'themes.php'
+    ],
 ];
 
 // Remove multiple menu pages remove_role_menu_pages( $role_slug, $menu_pages )

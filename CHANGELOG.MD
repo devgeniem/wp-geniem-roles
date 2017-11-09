@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleases
 
+## [0.2.5] - 2017-09-25
+
+### Modified
+- `remove_menu_pages` can now remove also submenu pages. See the documentation for the details.
+
 ## [0.2.4] - 2017-09-25
 
 ### Added
