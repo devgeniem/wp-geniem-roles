@@ -22,7 +22,7 @@ Move plugin to your WordPress installation `plugins/` folder.
 # Examples
 
 ## Initializing Geniem Roles
-Geniem roles plugin has been designed in Singleton architecture. Singleton is created inside the plugin. After plugin has been activated you are able to use Geniem roles functions.
+Geniem roles plugin has been designed in singleton architecture. Singleton is created inside the plugin. After plugin has been activated you are able to use Geniem roles functions.
 It is still good practice to check that plugin has been activated.
 
 ```php
@@ -65,7 +65,7 @@ You can call existing role from WordPress by calling function `\Geniem\Roles::ge
 $admin = \Geniem\Roles::get( 'administrator' );
 ```
 
-#### Add caps for a role
+### Add caps for a role
 ```php
 // Define desired capabilities for a role 'administrator'
 $admin_caps = [
