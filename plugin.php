@@ -6,7 +6,7 @@
  * Version: 0.3
  * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Geniem Oy
  * Author URI: https://geniem.fi
- **/
+ */
 
 namespace Geniem;
 
@@ -17,13 +17,15 @@ final class Roles {
 
     /**
      * Roles.
-     * @var [type]
+     *
+     * @var array Array of roles.
      */
-    protected static $roles;
+    private static $roles;
 
     /**
      * Singleton Geniem Roles instance.
-     * @var [type]
+     *
+     * @var object Instance of Geniem Roles.
      */
     private static $instance;
 
@@ -31,6 +33,7 @@ final class Roles {
      * Init roles singleton.
      */
     public static function instance() {
+
         if ( ! isset( self::$instance ) ) {
             self::$instance = new Roles();
         }
@@ -41,12 +44,13 @@ final class Roles {
     /**
      * Roles __constuctor
      */
-    public function __construct() {
+    private function __construct() {
 
         // Actions
-        add_action( 'init', array( __CLASS__, 'init' ) );
+        add_action( 'setup_theme', array( __CLASS__, 'load_current_roles' ) );
         add_action( 'init', array( __CLASS__, 'add_options_page' ) );
         add_action( 'admin_enqueue_scripts', array( __CLASS__, 'geniem_roles_styles' ) );
+
     }
 
     /**
@@ -62,24 +66,15 @@ final class Roles {
             'geniem-roles_page_wp-geniem-roles-slugs',
         ];
 
-        // Skip enqueue geniem-roles-styles if not on wp-geniem-roles menu page
+        // Skip enqueue geniem-roles-styles if not on wp-geniem-roles menu page.
         if ( in_array( $hook, $allowed, true ) ) {
             wp_enqueue_style( 'geniem_roles_styles', plugin_dir_url( __FILE__ ) . 'geniem-roles-styles.css', false, '1.0.6' );
         }
     }
 
     /**
-     * Initialize roles.
-     *
-     * @return void
-     */
-    public static function init() {
-        // Init roles.
-        self::load_current_roles();
-    }
-
-    /**
-     * Loads all active roles
+     * Loads all active roles.
+     * $wp_roles isn't available before setup_theme hook.
      */
     public static function load_current_roles() {
 
@@ -98,9 +93,11 @@ final class Roles {
                     $display_name = $value;
                 }
             }
+
             // Create Role instance.
             self::$roles[ $role->name ] = new Role( $role->name, $display_name );
         }
+
     }
 
     /**
@@ -109,31 +106,38 @@ final class Roles {
      * @return array $roles;
      */
     public static function get_roles() {
+
         $roles = self::$roles;
+
         return $roles;
     }
 
     /**
      * Create new roles
      *
-     * @param string  $name
-     * @param string  $display_name Translated later
-     * @param boolean $caps
+     * @param string  $name Role name in lowercase.
+     * @param string  $display_name Role display name.
+     * @param boolean $caps Capabilities to be added.
      */
     public static function create( $name, $display_name, $caps ) {
 
         // If role already exists return it
         if ( self::role_exists( $name ) ) {
+
             $role = self::$roles[ $name ];
+
             return $role;
         } else {
+
             // Merge capabilities.
             $caps = \wp_parse_args( $caps, Role::get_default_caps() );
 
             // Add role.
             \add_role( $name, $display_name, $caps );
 
+            // Create new \Geniem\Role intance.
             $role_instance = new Role( $name, $display_name );
+
             return $role_instance;
         }
     }
@@ -141,11 +145,13 @@ final class Roles {
     /**
      * Check if role exists.
      *
-     * @param string $slug Role slug.
+     * @param string $name Role name.
      * @return null|object $role|null role object or null.
      */
-    public static function role_exists( $slug ) {
-        $role = \get_role( $slug );
+    public static function role_exists( $name ) {
+
+        $role = \get_role( $name );
+
         return $role !== null;
     }
 
@@ -163,13 +169,14 @@ final class Roles {
     }
 
     /**
-     * Rename a role with new_name
+     * Rename a role with new_display_name.
      *
-     * @param string $slug Role slug.
-     * @param string $new_name New display name for role.
+     * @param string $name Role name.
+     * @param string $new_display_name New display name for role.
      * @return void
      */
-    public static function rename( $slug, $new_name ) {
+    public static function rename( $name, $new_display_name ) {
+
         global $wp_roles;
 
         if ( ! isset( $wp_roles ) ) {
@@ -177,97 +184,119 @@ final class Roles {
         }
 
         // Rename role
-        $wp_roles->roles[$slug]['name']   = $new_name;
+        $wp_roles->roles[ $name ]['name'] = $new_display_name;
     }
 
     /**
-     * Add caps to the role
+     * Add caps to the role.
      *
-     * @param string $role_slug
-     * @param [type] $caps
-     * @return no return
+     * @param string $name Role name.
+     * @param string $caps Role capabilities.
+     * @return false On fail returns false.
      */
-    public static function add_caps( $role_slug = '', $caps ) {
+    public static function add_caps( $name, $caps ) {
 
-        if ( ! empty( $role_slug ) || ! empty( $caps ) ) {
-            $role = \get_role( $role_slug );
+        // If role name is not set or caps are empty.
+        if ( ! empty( $name ) || ! empty( $caps ) ) {
 
-            // Loop through caps
-            if ( is_array( $caps ) && ! empty( $caps ) ) {
-                foreach ( $caps as $cap ) {
-                    // Add the capability.
+            // Get wp role
+            $role = \get_role( $name );
+
+            // Loop through removed caps.
+            foreach ( $caps as $cap ) {
+
+                // If cap isset for the role.
+                if ( isset( self::$roles[ $name ]->capabilities[ $cap ] ) ) {
+
+                    // Make sure that cap isn't true.
+                    if ( self::$roles[ $name ]->capabilities[ $cap ] !== true ) {
+
+                        // Add cap for a role.
+                        $role->add_cap( $cap );
+
+                    } else {
+
+                        return false;
+                    } // End if().
+                } else {
+
+                    // Add cap for a role.
                     $role->add_cap( $cap );
-                }
-            }
-        }
-        else {
-            error_log( 'called Geniem/remove_caps without parameters' );
+                } // End if().
+            } // End foreach().
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Remove role caps
-     */
     /**
      * Remove capabilities from a role.
      *
-     * @param string $role_slug Role slug.
+     * @param string $name Role slug.
      * @param array  $caps Array of capabilities to be removed.
-     * @return void
+     * @return false On fail returns false.
      */
-    public static function remove_caps( $role_slug = '', $caps ) {
+    public static function remove_caps( $name, $caps ) {
 
-        if ( ! empty( $role ) || ! empty( $caps ) ) {
-            $role = \get_role( $role_slug );
+        // If role name is not set or caps are empty.
+        if ( ! empty( $name ) || ! empty( $caps ) ) {
 
-            // Remove desired caps from a role.
-            if ( is_array( $caps ) && ! empty( $caps ) ) {
-                foreach ( $caps as $cap ) {
-                    // Remove the capability.
-                    $role->remove_cap( $cap );
+            // Loop through removed caps.
+            foreach ( $caps as $cap ) {
+
+                // If cap isset for the role.
+                if ( isset( self::$roles[ $name ]->capabilities[ $cap ] ) ) {
+
+                    // Make sure that cap is true.
+                    if ( self::$roles[ $name ]->capabilities[ $cap ] === true ) {
+
+                            // Get wp role
+                            $role = \get_role( $name );
+
+                            // Remove cap for a role.
+                            $role->remove_cap( $cap );
+
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
                 }
-            }
+            } // End foreach().
+        } else {
+            return false;
         }
-        else {
-            error_log( 'called Geniem/remove_caps without parameters' );
-        }
+
     }
 
     /**
      * If role exists return the role else returns false.
      * insert int or string
      *
-     * @param string $slug Role slug.
+     * @param string $name Role name.
      */
-    public static function get( $slug ) {
+    public static function get( $name ) {
 
         // Get from cache
-        if ( isset( self::$roles[ $slug ] ) ) {
-            return self::$roles[ $slug ];
-        } else {
-            // Variables
-            $name   = self::$roles[ $slug ]['name'];
-            $cap    = self::$roles[ $slug ]['capabilities'];
-
-            // Instace of Role
-            $role   = new Role( $slug, $name, $cap );
-
-            return $role;
+        if ( isset( self::$roles[ $name ] ) ) {
+            return self::$roles[ $name ];
         }
+
+        return null;
     }
 
     /**
      * Remove menu pages from a role.
      * note: All menu page slugs can be found from the admin Geniem Roles -> Menu slugs.
      *
-     * @param string $role_slug Role slug.
-     * @param string $menu_pages Menu page slug.
+     * @param string $name Role name.
+     * @param string $menu_pages Menu page slugs.
      * @return void
      */
-    public static function remove_menu_pages( $role_slug = '', $menu_pages = null ) {
+    public static function remove_menu_pages( $name = '', $menu_pages = null ) {
 
         // Run in admin_menu hook when called outside class
-        add_action( 'admin_init', function() use ( $role_slug, $menu_pages ) {
+        add_action( 'admin_init', function() use ( $name, $menu_pages ) {
 
             // user object
             $user = wp_get_current_user();
@@ -277,7 +306,7 @@ final class Roles {
              * Note: Some plugins cannot be removed in admin_menu -hook so we have to do it in admin_init.
              * In admin_init hook we have to check if not doing ajax to avoid errors.
              */
-            if ( in_array( $role_slug, $user->roles, true ) && ! wp_doing_ajax() ) {
+            if ( in_array( $name, $user->roles, true ) && ! wp_doing_ajax() ) {
 
                 if ( ! empty( $menu_pages ) ) {
 
@@ -430,6 +459,11 @@ final class Roles {
         echo '</div>';
     }
 
+    /**
+     * Get menu list.
+     *
+     * @return array An array of admin menu items.
+     */
     public static function get_menu_list() {
         global $menu, $submenu;
 
@@ -466,11 +500,11 @@ final class Roles {
     /**
      * Add function to map_meta_cap which disallows certain actions for role in specifed posts.
      *
-     * @param string $role_slug Role slug
+     * @param string $name Role name.
      * @param array  $blocked_posts
      * @param string $capability
      */
-    public static function restrict_post_edit( $role_slug, $blocked_posts, $capability ) {
+    public static function restrict_post_edit( $name, $blocked_posts, $capability ) {
         // TODO
         // Vertaile onko blocked_posts int vai string
         // Tee käsittelyt slugille ja post id:lle
@@ -478,17 +512,20 @@ final class Roles {
         // TODO
         // Add filter
         $current_user_roles = $current_user->roles;
+
         // Add function to map_meta_cap which disallows certain actions for role in specifed posts.
         // Check if we need to restrict current user.
-        if ( in_array( $role_slug, $current_user_roles, true ) ) {
+        if ( in_array( $name, $current_user_roles, true ) ) {
+
             /**
              * Map_meta_cap arguments.
+             * 
              * $caps (array) Returns the user's actual capabilities.
              * $cap (string) Capability name.
              * $user_id (int) The user ID.
              * $args (array) Adds the context to the cap. Typically the object ID.
              */
-            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $blocked_posts, $role_slug, $capability ) {
+            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $blocked_posts, $name, $capability ) {
                 // $args[0] is the post id.
                 if ( $cap === $capability && in_array( $args[ 0 ], $blocked_posts, true ) ) {
                     // This is default Wordpress way to restrict access.
@@ -499,8 +536,8 @@ final class Roles {
         }
     }
 
-    /*
-     * TODO: Filters gettext_with_context to translate role names.
+    /**
+     * Todo: Helper function to reset WordPress standard role.
      */
 }
 
@@ -510,18 +547,23 @@ final class Roles {
 class Role {
 
     /**
-     * Role name
+     * Role name for role identification.
+     *
+     * @var string Role name.
      */
     public $name;
 
     /**
-     * Role display name
+     * Role display name shown for the admin user.
+     *
+     * @var string Role display name.
      */
     public $display_name;
 
-
     /**
-     * Capabilities
+     * Role capabilities.
+     *
+     * @var array
      */
     public $capabilities;
 
@@ -600,17 +642,18 @@ class Role {
      */
     public function __construct( $name, $display_name ) {
 
+        // Get WordPress role.
         $role       = \get_role( $name );
 
         // Get role
         if ( $role ) {
-            // Set values.
+            // Set role properties..
             $this->capabilities = $role->capabilities;
             $this->name         = $role->name;
             $this->display_name = $display_name;
-        }
-        // Create new role
-        else {
+
+            // Create a new role and set role properties.
+        } else {
             $this->capabilities = self::get_default_caps();
             $this->name = $name;
             $this->display_name = $display_name;
@@ -618,7 +661,7 @@ class Role {
     }
 
     /**
-     * Remove a role
+     * Remove a role.
      *
      * @return void
      */
@@ -627,7 +670,7 @@ class Role {
     }
 
     /**
-     * Remove menu pages
+     * Remove menu pages.
      *
      * @param array $menu_pages Mixed array of removable admin menu items.
      * Array value can be a string or
@@ -642,7 +685,7 @@ class Role {
      * Add capabilities for a role
      * Makes db changes do not run everytime.
      *
-     * @param [type] $role_slug
+     * @param [type] $name
      * @param [type] $cap
      * @return void
      */
@@ -654,8 +697,7 @@ class Role {
      * Remove capabilities for a role
      * Makes db changes do not run everytime.
      *
-     * @param [type] $role_slug
-     * @param [type] $cap
+     * @param string $cap
      * @return void
      */
     public function remove_caps( $caps ) {
@@ -663,13 +705,10 @@ class Role {
     }
 
     /**
-     * Get all caps for by role.
-     *
-     * @param string $slug 
-     * @return void
+     * Get all caps from a role.
      */
-    public function get_caps( $slug ) {
-        return get_role( $slug )->capabilities;
+    public function get_caps() {
+        return \get_role( $this->name )->capabilities;
     }
 
     /**
@@ -683,10 +722,10 @@ class Role {
     }
 
     /**
-     * Block post edit view by post ids
+     * Restrict post editing capabilities by post ids.
      *
-     * @param string $blocked_posts
-     * @param string $capability
+     * @param string $blocked_posts An array of blocked post ids.
+     * @param string $capability Capability to restrict for the role.
      * @return void
      */
     public function restrict_post_edit( $blocked_posts, $capability ) {
@@ -703,3 +742,6 @@ class Role {
 function roles() {
     return Roles::instance();
 }
+
+// Create Geniem role singleton.
+roles();

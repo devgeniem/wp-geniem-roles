@@ -22,10 +22,14 @@ Move plugin to your WordPress installation `plugins/` folder.
 # Examples
 
 ## Initializing Geniem Roles
-First init \Geniem\Roles singleton by running a function `\Geniem\roles();`
+Geniem roles plugin has been designed in Singleton architecture. Singleton is created inside the plugin. After plugin has been activated you are able to use Geniem roles functions.
+It is still good practice to check that plugin has been activated.
+
 ```php
-// Init Geniem\Roles singleton
-\Geniem\roles();
+// If wp-geniem-roles is active.
+if ( class_exists( '\Geniem\Roles' ) ) {
+    // Run Geniem roles functions here.
+}
 ```
 
 ## Create a new role with capabilities
@@ -89,8 +93,12 @@ $roles_instance::remove_caps( 'administrator', $admin_removable_caps );
 ```php
 // Get a role.
 $author = \Geniem\Roles::get( 'author' );
-// Remove a role
-$author->remove();
+
+// If role is removed successfully this will cause an error on the next page load. 
+if ( $author ) {
+    // Remove a role
+    $author->remove();
+}
 ```
 
 ### Rename a role.
@@ -148,7 +156,7 @@ This function makes easy and fast to restrict editing of certain posts. Pass res
 
 ```php
 // Define restricted post IDs
-$frontpage_id = get_option( 'page_on_front' );
+$frontpage_id = (int) get_option( 'page_on_front' );
 
 $blocked_posts = [
     $frontpage_id,
