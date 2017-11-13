@@ -168,7 +168,7 @@ $admin->restrict_post_edit( $blocked_posts, $capability );
 
 ### Restrict user management by role
 Function to restrict users to manage users by the given roles and capabilities.
-note: Role will be removed from the WordPress admin user management dropdowns if the role has been restricted with the caps `edit_user` or `promote_user`.
+Role will be removed from the WordPress admin user management dropdowns for example bulk action "Change role to" if the role has been restricted with the caps `edit_user` or `promote_user`.
 
 ```php
 /**
