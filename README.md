@@ -196,7 +196,7 @@ $custom_role_restricted_user_roles = [
     ],
 ];
 
-$custom_role->restrict_user_management_by_role( $sininauha_admin_restricted_user_roles );
+$custom_role->restrict_user_management_by_role( $custom_role_restricted_user_roles );
 ```
 
 ### Grant super admin cap for a single user
