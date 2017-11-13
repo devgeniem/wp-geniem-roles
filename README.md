@@ -166,6 +166,39 @@ $blocked_posts = [
 $admin->restrict_post_edit( $blocked_posts, $capability );
 ```
 
+### Restrict user management by role
+Function to restrict users to manage users by the given roles and capabilities.
+note: Role will be removed from the WordPress admin user management dropdowns if the role has been restricted with the caps `edit_user` or `promote_user`.
+
+```php
+/**
+ * Associative array of removed caps by the role.
+ * $key = User role to be restricted from the role.
+ * $value = Array of removed caps from the role.
+ * 
+ * All possible user editing caps has been listed below:
+ * 'edit_user'
+ * 'delete_user'
+ * 'promote_user'
+ * 'remove_user'
+ */
+$custom_role_restricted_user_roles = [
+    // Role
+    'administrator' => [
+        // Removed caps.
+        'edit_user',
+        'delete_user',
+        'remove_user',
+    ],
+    // Another role
+    'editor' => [
+        'delete_user',
+    ],
+];
+
+$custom_role->restrict_user_management_by_role( $sininauha_admin_restricted_user_roles );
+```
+
 ### Grant super admin cap for a single user
 ```php
 \Geniem\Roles::grant_super_admin_cap( 1 );

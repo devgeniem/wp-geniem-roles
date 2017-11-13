@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code
- * Version: 0.3
+ * Version: 0.3.1
  * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Geniem Oy
  * Author URI: https://geniem.fi
  */
@@ -519,7 +519,7 @@ final class Roles {
 
             /**
              * Map_meta_cap arguments.
-             * 
+             *
              * $caps (array) Returns the user's actual capabilities.
              * $cap (string) Capability name.
              * $user_id (int) The user ID.
@@ -534,6 +534,87 @@ final class Roles {
                 return $caps;
             }, 10, 4 );
         }
+    }
+
+    /**
+     * Prevents user to create and manage users by the given user roles and capabilities.
+     * Removes role from the admin side dropdowns if
+     * 'edit_user' or 'promote_user' has been restricted.
+     *
+     * @param string $name Name of the role.
+     * @param array  $removed_user_caps_by_role Associative array of role specific restricted caps.
+     * key = Role to be restricted by the caps.
+     * value = Restricted caps for the given role. Role will be removed from the user management dropdowns if
+     * the role has been restricted with the caps 'edit_user' or 'promote_user'.
+     */
+    public static function restrict_user_management_by_role( $name, $removed_user_caps_by_role ) {
+
+        // Get current user.
+        $current_user       = wp_get_current_user();
+        $current_user_roles = $current_user->roles;
+
+        // Remove restricted role from the role lists in the admin side.
+        \add_filter( 'editable_roles', function ( $roles ) use ( $name, $removed_user_caps_by_role, $current_user_roles ) {
+
+            // If current users role is the smae as the edited one.
+            if ( in_array( $name, $current_user_roles, true ) ) {
+
+                // Loop through restricted user roles.
+                foreach ( $removed_user_caps_by_role as $role => $restricted_caps ) {
+
+                    $edit_user_caps = [
+                        'edit_user',
+                        'promote_user',
+                    ];
+
+                    // Loop through restricted caps.
+                    foreach ( $restricted_caps as $cap ) {
+                        if ( in_array( $cap, $edit_user_caps ) && isset( $roles[ $role ] ) ) {
+                            // Unset the role from editable roles.
+                            unset( $roles[ $role ] );
+                        }
+                    }
+                } // End foreach().
+
+                return $roles;
+            } // End if().
+
+        }); // End filter editable_roles.
+
+        // If current users role is the smae as the edited one.
+        if ( in_array( $name, $current_user_roles, true ) ) {
+
+            // Restrict user to manage users with given $removed_user_caps_by_role.
+            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $name, $removed_user_caps_by_role ) {
+
+                // Loop through the roles and their caps.
+                foreach ( $removed_user_caps_by_role as $role => $restricted_caps ) {
+
+                    // Check that array of caps have been assigned to the role.
+                    if ( ! empty( $restricted_caps ) && is_array( $restricted_caps ) ) {
+
+                        // Loop through roles restricted capabilities.
+                        foreach ( $restricted_caps as $restricted_cap ) {
+
+                            // Map meta cap switch case for user capabilities.
+                            if ( $cap === $restricted_cap ) {
+
+                                // Currently edited user.
+                                $edited_user = new \WP_User( absint( $args[0] ) );
+
+                                if ( in_array( $role, $edited_user->roles ) ) {
+                                    $caps[] = 'do_not_allow';
+                                }
+                            } // End if().
+                        } // End foreach().
+                    } // End if().
+                } // End foreach().
+
+                return $caps;
+
+            }, 10, 4 ); // End map_meta_cap.
+        } // End if().
+
     }
 
     /**
@@ -730,6 +811,20 @@ class Role {
      */
     public function restrict_post_edit( $blocked_posts, $capability ) {
         return Roles::restrict_post_edit( $this->name, $blocked_posts, $capability );
+    }
+
+    /**
+     * Prevents user to create and manage users by the given user roles and capabilities.
+     * Removes role from the admin side dropdowns if
+     * 'edit_user' or 'promote_user' has been restricted.
+     *
+     * @param array $removed_user_caps_by_role Associative array of role specific restricted caps.
+     * key = Role to be restricted.
+     * value = Restricted caps for the given role. If role will be restricted with caps
+     * edit_user or promote_user the role will be removed from the user management dropdowns.
+     */
+    public function restrict_user_management_by_role( $removed_user_caps_by_role ) {
+        return Roles::restrict_user_management_by_role( $this->name, $removed_user_caps_by_role );
     }
 
 }
