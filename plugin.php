@@ -575,9 +575,9 @@ final class Roles {
                         }
                     }
                 } // End foreach().
-
-                return $roles;
             } // End if().
+
+            return $roles;
 
         }); // End filter editable_roles.
 
