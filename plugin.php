@@ -180,11 +180,13 @@ final class Roles {
         global $wp_roles;
 
         if ( ! isset( $wp_roles ) ) {
+
             self::$roles = new WP_Roles();
         }
 
         // Rename role
         $wp_roles->roles[ $name ]['name'] = $new_display_name;
+        $wp_roles->role_names[ $name ] = $new_display_name;
     }
 
     /**

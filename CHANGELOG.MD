@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.3.1] - 2017-11-13
 - Added function `restrict_user_management_by_role()`.
 - Added documentation for `restrict_user_management_by_role()`.
+- Hotfix for role rename function.
 
 ## [0.3] - 2017-11-12
 
