@@ -320,7 +320,20 @@ final class Roles {
                             if ( is_array( $menu_page ) ) {
                                 foreach ( $menu_page as $submenu_item ) {
 
-                                    \remove_submenu_page( $main_lvl_key, $submenu_item );
+                                    // If we want to hide customize.php from admin menu we need to do some extra checks.
+                                    if ( $submenu_item === 'customize.php' ) {
+
+                                        // Get and form current page url ending.
+                                        $current_url            = \esc_url( 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+                                        $url_ending             = substr( $current_url, strrpos( $current_url, '/wp-admin/' ) + 0 );
+                                        $url_ending             = rawurlencode( $url_ending );
+                                        $current_customizer_url = 'customize.php?return=' . $url_ending;
+
+                                        \remove_submenu_page( $main_lvl_key, $current_customizer_url );
+
+                                    } else {
+                                        \remove_submenu_page( $main_lvl_key, $submenu_item );
+                                    }
                                 }
                             } else {
                                 \remove_menu_page( $menu_page );
@@ -387,8 +400,8 @@ final class Roles {
     public static function geniem_roles_html() {
 
         echo '<div class="geniem-roles">';
-        echo '<h1 class="dashicons-before dashicons-universal-access"> '. __( 'Geniem roles', 'geniem-roles' ) . '</h1>';
-        echo '<p>'. __( 'This page lists all current roles and their enabled capabilities.', 'geniem-roles' ) . '</p>';
+        echo '<h1 class="dashicons-before dashicons-universal-access"> ' . __( 'Geniem roles', 'geniem-roles' ) . '</h1>';
+        echo '<p>' . __( 'This page lists all current roles and their enabled capabilities.', 'geniem-roles' ) . '</p>';
 
         // Do not list cap if in $legacy_caps
         $legacy_caps = [ 'level_10', 'level_9', 'level_8', 'level_7', 'level_6', 'level_5', 'level_4', 'level_3', 'level_2', 'level_1', 'level_0' ];

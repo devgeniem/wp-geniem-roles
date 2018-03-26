@@ -6,10 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleases
 
-## [0.3.1] - 2017-11-13
+## [0.4.0] - 2018-03-26
 - Added function `restrict_user_management_by_role()`.
 - Added documentation for `restrict_user_management_by_role()`.
 - Hotfix for role rename function.
+- Added support for removing WordPress customizer menu page `customize.php` from the admin menu. Changes implemented in the function `remove_menu_pages()`.
 
 ## [0.3] - 2017-11-12
 
