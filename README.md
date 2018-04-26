@@ -217,3 +217,9 @@ By default Geniem Roles defines all capabilities to false if you want to change 
 
 # Admin page menu slugs
 `wp-geniem-roles` creates a admin page which lists all menu slugs. This is helper page for usage of function `remove_menu_pages()`. See the function documentation for more information.
+
+# Roles on network installation
+WordPress documentation for user management capabilities on network is fragmented. We have listed here some nice to know information.
+
+## create_users capability on network
+If you have created custom roles that can create new users for the site note that you also need to enable network site option "Add New Users" (`add_new_users` on database). The setting can be found from the wp-admin settings page https://sitedomain.com/wp-admin/network/settings.php.

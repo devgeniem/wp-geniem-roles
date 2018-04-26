@@ -669,20 +669,30 @@ class Role {
     public static function get_default_caps() {
 
         $defaults = array(
+
             // Network (Super Admin)
             'create_sites'              => false,
             'delete_sites'              => false,
             'manage_network'            => false,
             'manage_sites'              => false,
-            'manage_network_users'      => false,
             'manage_network_plugins'    => false,
             'manage_network_themes'     => false,
             'manage_network_options'    => false,
+            'manage_network_users'      => false,
 
             // CSS
             'edit_css'                  => false,
 
-            // Users
+            /** ------------------------------------------------------
+             *  Users
+             *
+             *  On network installation user creation needs also
+             *  site option add_new_user.
+             * 
+             *  The setting can be found from the wp-admin
+             *  https://sitedomain.com/wp-admin/network/settings.php
+             *  ------------------------------------------------------ */ 
+
             'add_users'                 => false,
             'create_users'              => false,
             'delete_users'              => false,
