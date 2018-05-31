@@ -86,7 +86,7 @@ $admin_removable_caps = [
 ];
 
 // Run function remove_caps for desired wp role
-$roles_instance::remove_caps( 'administrator', $admin_removable_caps );
+$admin::remove_caps( $admin_removable_caps );
 ```
 
 ### Remove a role.
