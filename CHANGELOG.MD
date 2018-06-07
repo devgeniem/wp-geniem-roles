@@ -6,7 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleases
 
+## [user-management-documentation] - 2018-04-26
+
+### Modified
+- Enhanced documentation for `get_default_caps()` and `README.md` heading for networks.
+
 ## [0.4.0] - 2018-03-26
+
+### Added
 - Added function `restrict_user_management_by_role()`.
 - Added documentation for `restrict_user_management_by_role()`.
 - Hotfix for role rename function.
