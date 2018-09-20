@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleases
 
+## [v1.0.0] - 2018-09-19
+
+### Modified
+- Better documentation.
+- Escaping strings.
+- Role reset function `reset_to_default_roles()` to reset roles to the WordPress standard roles.
+- Role reseting function for development `reset_roles()` to reset roles after changes.
+
 ## [user-management-documentation] - 2018-04-26
 
 ### Modified

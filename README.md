@@ -10,7 +10,7 @@ composer.json
 ```json
 ...
 "require": {
-    "devgeniem/wp-geniem-roles": "^0.1.0",
+    "devgeniem/wp-geniem-roles": "*",
     ...
 }
 ...
@@ -56,6 +56,25 @@ if ( is_wp_error( $new_role ) ) {
     error_log( $new_role->get_error_messages() );
 }
 ```
+
+## Development guidelines
+User roles are stored in the database so you need to reset roles in the database after changes to the roles. This can be done with wp-geniem-roles or wp cli.
+
+### Reset roles with wp-geniem-roles.
+wp-geniem-roles resets WordPress standard and custom roles with one method.
+```php
+\Geniem\Roles::reset_roles();
+```
+
+### Reset Roles to WordPress default roles.
+wp-geniem-roles resets all roles to WordPress default ones with one method.
+```php
+\Geniem\Roles::reset_to_default_roles();
+```
+
+### WP CLI reset roles.
+You can also reset roles with WP CLI see the documentation from here.
+https://developer.wordpress.org/cli/commands/role/
 
 ## Get and manipulate a role
 You can call existing role from WordPress by calling function `\Geniem\Roles::get( $role_slug );`. You can use a role as an object to manipulate the role. See the example from the below.
@@ -104,7 +123,7 @@ if ( $author ) {
 ### Rename a role.
 ```php
 // Rename a role
-$author->rename( 'new_slug', 'New Name' );
+$author->rename( 'New name' );
 ```
 
 ### Remove menu pages from a role

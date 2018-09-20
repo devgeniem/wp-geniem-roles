@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
- * Description: WordPress plugin to edit and create roles in code
- * Version: 0.4.0
+ * Description: WordPress plugin to edit and create roles in code.
+ * Version: 1.0.0
  * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Geniem Oy
  * Author URI: https://geniem.fi
  */
@@ -157,6 +157,7 @@ final class Roles {
 
     /**
      * Remove roles.
+     *
      * @param string $name Role name.
      */
     public static function remove_role( $name ) {
@@ -186,7 +187,7 @@ final class Roles {
 
         // Rename role
         $wp_roles->roles[ $name ]['name'] = $new_display_name;
-        $wp_roles->role_names[ $name ] = $new_display_name;
+        $wp_roles->role_names[ $name ]    = $new_display_name;
     }
 
     /**
@@ -293,7 +294,7 @@ final class Roles {
      *
      * @param string $name Role name.
      * @param string $menu_pages Menu page slugs.
-     * @return void
+     * @return false On fail returns false.
      */
     public static function remove_menu_pages( $name = '', $menu_pages = null ) {
 
@@ -354,9 +355,9 @@ final class Roles {
     }
 
     /**
-     * Add a user to the Super admin user list in WordPress Multisite
+     * Add a user to the Super admin user list in WordPress Multisite.
      *
-     * @return No return.
+     * @param string $user_id User ID.
      */
     public static function grant_super_admin_cap( $user_id ) {
         grant_super_admin( $user_id );
@@ -366,14 +367,17 @@ final class Roles {
      * Adds WP Ga options settings
      */
     public static function add_options_page() {
+
         if ( is_admin() ) {
             // Run in admin_menu hook when called outside class
             add_action( 'admin_menu', function() {
 
+                $menu_page_capability = apply_filters( 'geniem/roles/add_menu_page_cap', 'activate_plugins' );
+
                 \add_menu_page(
                     __( 'Geniem Roles', 'wp-geniem-roles' ), // page title
                     __( 'Geniem Roles', 'wp-geniem-roles' ), // menu title
-                    'activate_plugins',                      // capability
+                    $menu_page_capability,
                     'wp-geniem-roles',                       // menu slug
                     array( __CLASS__, 'geniem_roles_html' ), // render function
                     'dashicons-universal-access',
@@ -384,7 +388,7 @@ final class Roles {
                     'wp-geniem-roles',                                   // parent menu slug
                     __( 'Geniem Roles: Menu slugs', 'wp-geniem-roles' ), // page title
                     __( 'Menu slugs', 'wp-geniem-roles' ),               // menu title
-                    'activate_plugins',                                  // capability
+                    $menu_page_capability,
                     'wp-geniem-roles-slugs',                             // menu slug
                     array( __CLASS__, 'geniem_roles_slug_html' )         // render function
                 );
@@ -393,18 +397,28 @@ final class Roles {
     }
 
     /**
-     * Geniem roles printable html
-     *
-     * @return void
+     * Geniem roles printable html.
      */
     public static function geniem_roles_html() {
 
         echo '<div class="geniem-roles">';
-        echo '<h1 class="dashicons-before dashicons-universal-access"> ' . __( 'Geniem roles', 'geniem-roles' ) . '</h1>';
-        echo '<p>' . __( 'This page lists all current roles and their enabled capabilities.', 'geniem-roles' ) . '</p>';
+        echo '<h1 class="dashicons-before dashicons-universal-access"> ' . esc_html__( 'Geniem roles', 'geniem-roles' ) . '</h1>';
+        echo '<p>' . esc_html__( 'This page lists all current roles and their enabled capabilities.', 'geniem-roles' ) . '</p>';
 
         // Do not list cap if in $legacy_caps
-        $legacy_caps = [ 'level_10', 'level_9', 'level_8', 'level_7', 'level_6', 'level_5', 'level_4', 'level_3', 'level_2', 'level_1', 'level_0' ];
+        $legacy_caps = [
+            'level_10',
+            'level_9',
+            'level_8',
+            'level_7',
+            'level_6',
+            'level_5',
+            'level_4',
+            'level_3',
+            'level_2',
+            'level_1',
+            'level_0',
+        ];
 
         if ( ! empty( self::$roles ) ) {
 
@@ -417,7 +431,7 @@ final class Roles {
                 echo '<div class="geniem-roles__single-role">';
 
                 // Name
-                echo '<h2>' . $role->display_name . '</h2>';
+                echo '<h2>' . esc_html( $role->display_name ) . '</h2>';
 
                 // Caps
                 echo '<ul>';
@@ -427,7 +441,7 @@ final class Roles {
                         $formated_cap = \str_replace( '_', ' ', $key );
 
                         if ( ! in_array( $key, $legacy_caps ) && $value !== false ) {
-                            echo '<li>' . $formated_cap . '</li>';
+                            echo '<li>' . esc_html( $formated_cap ) . '</li>';
                         }
                     }
                 }
@@ -442,28 +456,28 @@ final class Roles {
 
     /**
      * Geniem roles menu items slug list.
-     *
-     * @return void
      */
     public static function geniem_roles_slug_html() {
+
         $menu_list = self::get_menu_list();
 
         echo '<div class="geniem-roles">';
-        echo '<h1 class="dashicons-before dashicons-universal-access"> ' . __( 'Geniem roles', 'geniem-roles' ) . '</h1>';
-        echo '<p>'. __( 'This page lists all admin menu slugs.', 'geniem-roles' ) . '</p>';
+        echo '<h1 class="dashicons-before dashicons-universal-access"> ' . esc_html__( 'Geniem roles', 'geniem-roles' ) . '</h1>';
+        echo '<p>' . esc_html__( 'This page lists all admin menu slugs.', 'geniem-roles' ) . '</p>';
         echo '<div class="geniem-roles__wrapper">';
         echo '<div class="geniem-roles__slugs">';
         echo '<table>';
+
         foreach ( $menu_list as $menu ) {
             echo '<tr>';
-            echo '<td>' . $menu->label . '</td>';
-            echo '<td>' . $menu->path . '</td>';
+            echo '<td>' . esc_html( $menu->label ) . '</td>';
+            echo '<td>' . esc_html( $menu->path ) . '</td>';
             echo '</tr>';
 
             foreach ( $menu->children as $child_menu ) {
                 echo '<tr class="child-menu">';
-                echo '<td>' . $child_menu->label . '</td>';
-                echo '<td>' . $child_menu->path . '</td>';
+                echo '<td>' . esc_html( $child_menu->label ) . '</td>';
+                echo '<td>' . esc_html( $child_menu->path ) . '</td>';
                 echo '</tr>';
             }
         }
@@ -486,8 +500,8 @@ final class Roles {
         foreach ( $menu as $i => $menu_data ) {
             if ( $menu_data[0] ) {
                 $parent_menu = (object) [
-                    'label' => strip_tags( $menu_data[0] ),
-                    'path' => $menu_data[2],
+                    'label'    => strip_tags( $menu_data[0] ),
+                    'path'     => $menu_data[2],
                     'children' => [],
                 ];
 
@@ -499,7 +513,7 @@ final class Roles {
                 $sub_menus = array_map( function( $menu ) {
                     $item = (object) [
                         'label' => strip_tags( $menu[0] ),
-                        'path' => $menu[2],
+                        'path'  => $menu[2],
                     ];
 
                     return $item;
@@ -515,22 +529,17 @@ final class Roles {
     /**
      * Add function to map_meta_cap which disallows certain actions for role in specifed posts.
      *
-     * @param string $name Role name.
-     * @param array  $blocked_posts
-     * @param string $capability
+     * @param string $name WP Role name.
+     * @param array  $blocked_posts Blocked posts.
+     * @param string $capability Capability which is disallowed for the user.
      */
     public static function restrict_post_edit( $name, $blocked_posts, $capability ) {
-        // TODO
-        // Vertaile onko blocked_posts int vai string
-        // Tee käsittelyt slugille ja post id:lle
+
         $current_user = wp_get_current_user();
-        // TODO
-        // Add filter
-        $current_user_roles = $current_user->roles;
 
         // Add function to map_meta_cap which disallows certain actions for role in specifed posts.
         // Check if we need to restrict current user.
-        if ( in_array( $name, $current_user_roles, true ) ) {
+        if ( in_array( $name, $current_user->roles, true ) ) {
 
             /**
              * Map_meta_cap arguments.
@@ -542,7 +551,7 @@ final class Roles {
              */
             \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $blocked_posts, $name, $capability ) {
                 // $args[0] is the post id.
-                if ( $cap === $capability && in_array( $args[ 0 ], $blocked_posts, true ) ) {
+                if ( $cap === $capability && in_array( $args[0], $blocked_posts, true ) ) {
                     // This is default Wordpress way to restrict access.
                     $caps[] = 'do_not_allow';
                 }
@@ -556,11 +565,16 @@ final class Roles {
      * Removes role from the admin side dropdowns if
      * 'edit_user' or 'promote_user' has been restricted.
      *
+     * Example usage:
+     * 'administrator' => [
+     *     'add_user',
+     *     'edit_user',
+     *     'delete_user',
+     *     'remove_user',
+     * ],
+     *
      * @param string $name Name of the role.
      * @param array  $removed_user_caps_by_role Associative array of role specific restricted caps.
-     * key = Role to be restricted by the caps.
-     * value = Restricted caps for the given role. Role will be removed from the user management dropdowns if
-     * the role has been restricted with the caps 'edit_user' or 'promote_user'.
      */
     public static function restrict_user_management_by_role( $name, $removed_user_caps_by_role ) {
 
@@ -596,7 +610,7 @@ final class Roles {
 
         }); // End filter editable_roles.
 
-        // If current users role is the smae as the edited one.
+        // If current users role is the same as the edited one.
         if ( in_array( $name, $current_user_roles, true ) ) {
 
             // Restrict user to manage users with given $removed_user_caps_by_role.
@@ -629,12 +643,33 @@ final class Roles {
 
             }, 10, 4 ); // End map_meta_cap.
         } // End if().
-
     }
 
     /**
-     * Todo: Helper function to reset WordPress standard role.
+     * Helper function reset default WordPress roles.
      */
+    public static function reset_to_default_roles() {
+        require_once( ABSPATH . 'wp-admin/includes/schema.php' );
+        \populate_roles();
+    }
+
+    /**
+     * Reset roles from the database.
+     * Run this before your role changes on your theme.
+     *
+     * @return void
+     */
+    public static function reset_roles() {
+
+        global $wp_roles;
+
+        foreach ( $wp_roles->roles as $role_name => $role ) {
+            \remove_role( $role_name );
+        }
+
+        // Create and define WordPress default roles.
+        Roles::reset_to_default_roles();
+    }
 }
 
 /**
@@ -688,10 +723,10 @@ class Role {
              *
              *  On network installation user creation needs also
              *  site option add_new_user.
-             * 
+             *
              *  The setting can be found from the wp-admin
              *  https://sitedomain.com/wp-admin/network/settings.php
-             *  ------------------------------------------------------ */ 
+             *  ------------------------------------------------------ */
 
             'add_users'                 => false,
             'create_users'              => false,
@@ -761,15 +796,13 @@ class Role {
             // Create a new role and set role properties.
         } else {
             $this->capabilities = self::get_default_caps();
-            $this->name = $name;
+            $this->name         = $name;
             $this->display_name = $display_name;
         }
     }
 
     /**
      * Remove a role.
-     *
-     * @return void
      */
     public function remove() {
         Roles::remove_role( $this->name );
@@ -781,7 +814,6 @@ class Role {
      * @param array $menu_pages Mixed array of removable admin menu items.
      * Array value can be a string or
      * assoaciative array item 'parent_slug' => [ 'submenu_item1_slug', 'submenu_item2_slug' ].
-     * @return void
      */
     public function remove_menu_pages( $menu_pages ) {
         Roles::remove_menu_pages( $this->name, $menu_pages );
@@ -791,9 +823,7 @@ class Role {
      * Add capabilities for a role
      * Makes db changes do not run everytime.
      *
-     * @param [type] $name
-     * @param [type] $cap
-     * @return void
+     * @param array $caps An array of capabilities.
      */
     public function add_caps( $caps ) {
         Roles::add_caps( $this->name, $caps );
@@ -803,8 +833,7 @@ class Role {
      * Remove capabilities for a role
      * Makes db changes do not run everytime.
      *
-     * @param string $cap
-     * @return void
+     * @param array $caps An array of capabilities to be removed.
      */
     public function remove_caps( $caps ) {
         Roles::remove_caps( $this->name, $caps );
@@ -821,7 +850,6 @@ class Role {
      * Rename a role.
      *
      * @param string $new_display_name Display name for a role.
-     * @return void
      */
     public function rename( $new_display_name ) {
         return Roles::rename( $this->name, $new_display_name );
@@ -832,21 +860,23 @@ class Role {
      *
      * @param string $blocked_posts An array of blocked post ids.
      * @param string $capability Capability to restrict for the role.
-     * @return void
      */
     public function restrict_post_edit( $blocked_posts, $capability ) {
         return Roles::restrict_post_edit( $this->name, $blocked_posts, $capability );
     }
 
     /**
-     * Prevents user to create and manage users by the given user roles and capabilities.
-     * Removes role from the admin side dropdowns if
-     * 'edit_user' or 'promote_user' has been restricted.
+     * Restrict user management capabilities for the given role object.
+     *
+     * Example usage:
+     * 'administrator' => [
+     *     'add_user',
+     *     'edit_user',
+     *     'delete_user',
+     *     'remove_user',
+     * ],
      *
      * @param array $removed_user_caps_by_role Associative array of role specific restricted caps.
-     * key = Role to be restricted.
-     * value = Restricted caps for the given role. If role will be restricted with caps
-     * edit_user or promote_user the role will be removed from the user management dropdowns.
      */
     public function restrict_user_management_by_role( $removed_user_caps_by_role ) {
         return Roles::restrict_user_management_by_role( $this->name, $removed_user_caps_by_role );
