@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleases
 
+## [1.0.2] - 2019-01-25
+
+### Modified
+- Fixed wp-geniem-roles option page rename issue.
+
+
 ## [1.0.1] - 2018-10-18
 
 ### Modified

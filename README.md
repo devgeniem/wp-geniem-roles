@@ -80,7 +80,7 @@ https://developer.wordpress.org/cli/commands/role/
 You can call existing role from WordPress by calling function `\Geniem\Roles::get( $role_slug );`. You can use a role as an object to manipulate the role. See the example from the below.
 
 ```php
-// creates a instace of \Geniem\Role
+// Gets a role instance of \Geniem\Roles
 $admin = \Geniem\Roles::get( 'administrator' );
 ```
 
@@ -105,7 +105,7 @@ $admin_removable_caps = [
 ];
 
 // Run function remove_caps for desired wp role
-$admin::remove_caps( $admin_removable_caps );
+$admin->remove_caps( $admin_removable_caps );
 ```
 
 ### Remove a role.
@@ -177,12 +177,12 @@ This function makes easy and fast to restrict editing of certain posts. Pass res
 // Define restricted post IDs
 $frontpage_id = (int) get_option( 'page_on_front' );
 
-$blocked_posts = [
+$restricted_posts = [
     $frontpage_id,
     2
 ];
 
-$admin->restrict_post_edit( $blocked_posts, $capability );
+$admin->restrict_post_edit( $restricted_posts, $capability );
 ```
 
 ### Restrict user management by role

@@ -46,11 +46,13 @@ final class Roles {
      */
     private function __construct() {
 
-        // Actions
-        add_action( 'setup_theme', array( __CLASS__, 'load_current_roles' ) );
-        add_action( 'init', array( __CLASS__, 'add_options_page' ) );
-        add_action( 'admin_enqueue_scripts', array( __CLASS__, 'geniem_roles_styles' ) );
+        add_action( 'setup_theme', [ __CLASS__, 'reset_roles_on_admin_page' ] );
 
+        // Actions
+        add_action( 'setup_theme', [ __CLASS__, 'load_current_roles' ] );
+        add_action( 'init', [ __CLASS__, 'add_options_page' ] );
+        add_action( 'admin_enqueue_scripts', [ __CLASS__, 'geniem_roles_styles' ] );
+        
     }
 
     /**
@@ -70,6 +72,24 @@ final class Roles {
         if ( in_array( $hook, $allowed, true ) ) {
             wp_enqueue_style( 'geniem_roles_styles', plugin_dir_url( __FILE__ ) . 'geniem-roles-styles.css', false, '1.0.6' );
         }
+    }
+
+    /**
+     * Reset roles if current screen is.
+     *
+     * @param object $current_screen Global current_screen object.
+     */
+    public static function reset_roles_on_admin_page() {
+
+/*         global $pagenow;
+        global $current_screen;
+
+        var_dump( $pagenow );
+        var_dump( $current_screen );
+
+        if ( $current_screen->id === 'toplevel_page_wp-geniem-roles' ) { */
+            self::reset_roles();
+        /* } */
     }
 
     /**
@@ -97,7 +117,6 @@ final class Roles {
             // Create Role instance.
             self::$roles[ $role->name ] = new Role( $role->name, $display_name );
         }
-
     }
 
     /**
@@ -180,14 +199,12 @@ final class Roles {
 
         global $wp_roles;
 
-        if ( ! isset( $wp_roles ) ) {
-
-            self::$roles = new WP_Roles();
-        }
-
         // Rename role
         $wp_roles->roles[ $name ]['name'] = $new_display_name;
         $wp_roles->role_names[ $name ]    = $new_display_name;
+
+        // Update also geniem roles instance name.
+        self::$roles[ $name ]->name = $new_display_name;
     }
 
     /**
@@ -352,6 +369,46 @@ final class Roles {
                 }
             }
         });
+
+        // Handle related wp_admin_bar items automatically.
+        add_action( 'wp_before_admin_bar_render', function() use ( $menu_pages ) {
+
+            global $wp_admin_bar;
+
+            $nodes = $wp_admin_bar->get_nodes();
+
+            foreach ( $nodes as $key => $node ) {
+
+                if ( ! empty( $node->href ) ) {
+                    $href          = parse_url( $node->href, PHP_URL_PATH );
+                    $splitted_href = explode( '/', $href );
+                    $end_of_url    = end( $splitted_href );
+
+                    if ( self::in_array_r( $end_of_url, $menu_pages ) ) {
+                        $wp_admin_bar->remove_node( $node->id );
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Recursive in array function.
+     *
+     * @param string $needle String value to be fetched.
+     * @param array $haystack Multidimensional array.
+     * 
+     * @return boolean If value was found.
+     */
+    public static function in_array_r( $needle, $haystack ) {
+
+        foreach ( $haystack as $item ) {
+            if ( ( $item == $needle ) || ( is_array( $item ) && self::in_array_r( $needle, $item ) ) ) {
+                return true;
+            }
+        }
+    
+        return false;
     }
 
     /**
@@ -369,6 +426,7 @@ final class Roles {
     public static function add_options_page() {
 
         if ( is_admin() ) {
+
             // Run in admin_menu hook when called outside class
             add_action( 'admin_menu', function() {
 
@@ -401,6 +459,8 @@ final class Roles {
      */
     public static function geniem_roles_html() {
 
+        global $wp_roles;
+
         echo '<div class="geniem-roles">';
         echo '<h1 class="dashicons-before dashicons-universal-access"> ' . esc_html__( 'Geniem roles', 'geniem-roles' ) . '</h1>';
         echo '<p>' . esc_html__( 'This page lists all current roles and their enabled capabilities.', 'geniem-roles' ) . '</p>';
@@ -420,23 +480,23 @@ final class Roles {
             'level_0',
         ];
 
-        if ( ! empty( self::$roles ) ) {
+        if ( ! empty( $wp_roles->roles ) ) {
 
-            $i = 1;
             echo '<div class="geniem-roles__wrapper">';
+
             // Roles
-            foreach ( self::$roles as $role ) {
+            foreach ( $wp_roles->roles as $roles_slug => $role ) {
 
                 // Single role wrap
                 echo '<div class="geniem-roles__single-role">';
 
                 // Name
-                echo '<h2>' . esc_html( $role->display_name ) . '</h2>';
+                echo '<h2>' . esc_html( $role['name'] ) . '</h2>';
 
                 // Caps
                 echo '<ul>';
-                if ( ! empty( $role->capabilities ) ) {
-                    foreach ( $role->capabilities as $key => $value ) {
+                if ( ! empty( $role['capabilities'] ) ) {
+                    foreach ( $role['capabilities'] as $key => $value ) {
 
                         $formated_cap = \str_replace( '_', ' ', $key );
 
