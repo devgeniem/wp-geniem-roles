@@ -376,22 +376,19 @@ final class Roles {
 
             foreach ( $nodes as $key => $node ) {
 
-                if ( $node->id === 'network-admin-stream' ) {
+                $splitted_href = explode( '/', $node->href );
+                $end_of_url    = end( $splitted_href );
 
-                    $splitted_href = explode( '/', $node->href );
-                    $end_of_url    = end( $splitted_href );
+                $page_param_position = strpos( $end_of_url, '?page=' );
 
-                    $page_param_position = strpos( $end_of_url, '?page=' );
+                // If page parameter take the end of the string.
+                if ( $page_param_position ) {
+                    $end_of_url_position = $page_param_position + strlen( '?page=' );
+                    $end_of_url          = substr( $end_of_url, $end_of_url_position );
+                }
 
-                    // If page parameter take the end of the string.
-                    if ( $page_param_position ) {
-                        $end_of_url_position = $page_param_position + strlen( '?page=' );
-                        $end_of_url          = substr( $end_of_url, $end_of_url_position );
-                    }
-
-                    if ( self::in_array_r( $end_of_url, $menu_pages ) ) {
-                        $wp_admin_bar->remove_node( $node->id );
-                    }
+                if ( self::in_array_r( $end_of_url, $menu_pages ) ) {
+                    $wp_admin_bar->remove_node( $node->id );
                 }
             }
         });
