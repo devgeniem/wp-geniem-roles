@@ -372,21 +372,23 @@ final class Roles {
 
             $nodes = $wp_admin_bar->get_nodes();
 
-            foreach ( $nodes as $key => $node ) {
+            if ( ! empty( $nodes ) ) {
+                foreach ( $nodes as $key => $node ) {
 
-                $splitted_href = explode( '/', $node->href );
-                $end_of_url    = end( $splitted_href );
-
-                $page_param_position = strpos( $end_of_url, '?page=' );
-
-                // If page parameter take the end of the string.
-                if ( $page_param_position ) {
-                    $end_of_url_position = $page_param_position + strlen( '?page=' );
-                    $end_of_url          = substr( $end_of_url, $end_of_url_position );
-                }
-
-                if ( self::in_array_r( $end_of_url, $menu_pages ) ) {
-                    $wp_admin_bar->remove_node( $node->id );
+                    $splitted_href = explode( '/', $node->href );
+                    $end_of_url    = end( $splitted_href );
+    
+                    $page_param_position = strpos( $end_of_url, '?page=' );
+    
+                    // If page parameter take the end of the string.
+                    if ( $page_param_position ) {
+                        $end_of_url_position = $page_param_position + strlen( '?page=' );
+                        $end_of_url          = substr( $end_of_url, $end_of_url_position );
+                    }
+    
+                    if ( self::in_array_r( $end_of_url, $menu_pages ) ) {
+                        $wp_admin_bar->remove_node( $node->id );
+                    }
                 }
             }
         });
