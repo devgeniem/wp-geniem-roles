@@ -75,15 +75,13 @@ final class Roles {
 
     /**
      * Reset roles if current screen is.
-     *
-     * @param object $current_screen Global current_screen object.
      */
     public static function reset_roles_on_admin_page() {
 
         if ( is_admin() ) {
-            $geniem_roles_page = filter_input( INPUT_GET, 'page' );
+            $page_param = filter_input( INPUT_GET, 'page' );
 
-            if ( $geniem_roles_page === 'wp-geniem-roles' ) {
+            if ( $page_param === 'wp-geniem-roles' ) {
                 self::reset_roles();
             }
         }
