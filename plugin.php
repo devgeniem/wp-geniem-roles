@@ -52,7 +52,6 @@ final class Roles {
         add_action( 'setup_theme', [ __CLASS__, 'load_current_roles' ] );
         add_action( 'init', [ __CLASS__, 'add_options_page' ] );
         add_action( 'admin_enqueue_scripts', [ __CLASS__, 'geniem_roles_styles' ] );
-        
     }
 
     /**
@@ -81,15 +80,13 @@ final class Roles {
      */
     public static function reset_roles_on_admin_page() {
 
-/*         global $pagenow;
-        global $current_screen;
+        if ( is_admin() ) {
+            $geniem_roles_page = filter_input( INPUT_GET, 'page' );
 
-        var_dump( $pagenow );
-        var_dump( $current_screen );
-
-        if ( $current_screen->id === 'toplevel_page_wp-geniem-roles' ) { */
-            self::reset_roles();
-        /* } */
+            if ( $geniem_roles_page === 'wp-geniem-roles' ) {
+                self::reset_roles();
+            }
+        }
     }
 
     /**
@@ -379,10 +376,18 @@ final class Roles {
 
             foreach ( $nodes as $key => $node ) {
 
-                if ( ! empty( $node->href ) ) {
-                    $href          = parse_url( $node->href, PHP_URL_PATH );
-                    $splitted_href = explode( '/', $href );
+                if ( $node->id === 'network-admin-stream' ) {
+
+                    $splitted_href = explode( '/', $node->href );
                     $end_of_url    = end( $splitted_href );
+
+                    $page_param_position = strpos( $end_of_url, '?page=' );
+
+                    // If page parameter take the end of the string.
+                    if ( $page_param_position ) {
+                        $end_of_url_position = $page_param_position + strlen( '?page=' );
+                        $end_of_url          = substr( $end_of_url, $end_of_url_position );
+                    }
 
                     if ( self::in_array_r( $end_of_url, $menu_pages ) ) {
                         $wp_admin_bar->remove_node( $node->id );
