@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.2] - 2019-01-25
 
+### Added
+- Reset roles on wp-geniem-roles admin page on load.
+
 ### Modified
 - Fixed wp-geniem-roles option page rename issue.
-
+- remove_menu_pages() removes now also admin_bar menu pages.
 
 ## [1.0.1] - 2018-10-18
 
