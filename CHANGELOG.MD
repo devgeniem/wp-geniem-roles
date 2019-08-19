@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleases
 
+## [1.0.4] - 2019-08-19
+
+### Added
+- Support for resetting roles on multisite with CLI command `wp eval "\Geniem\Roles::reset_roles();"`
+
 ## [1.0.3] - 2019-03-01
 
 ### Modified

@@ -3,8 +3,8 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code.
- * Version: 1.0.3
- * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Geniem Oy
+ * Version: 1.0.4
+ * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Ville Pietarinen / Geniem Oy
  * Author URI: https://geniem.fi
  */
 
@@ -725,12 +725,39 @@ final class Roles {
 
         global $wp_roles;
 
-        foreach ( $wp_roles->roles as $role_name => $role ) {
-            \remove_role( $role_name );
+        // Check if multisite and roles reset is requested from CLI
+        // Reset roles on all sites
+        if ( \is_multisite() && defined( 'WP_CLI' ) && WP_CLI ) {
+            // Get the sites. Default amount is 100 and there is no flag to list all sites so we have to use
+            // high number here. Maybe would be better to use custom SQL query later if there is going to be
+            // huge amounts of sites.
+            $sites_args = [
+                'number' => 1000,
+            ];
+            $sites = \get_sites( $sites_args );
+            foreach ( $sites as $site ) {
+                \switch_to_blog( $site->blog_id );
+
+                foreach ( $wp_roles->roles as $role_name => $role ) {
+                    \remove_role( $role_name );
+                }
+
+                // Create and define WordPress default roles.
+                Roles::reset_to_default_roles();
+            }
+            \restore_current_blog();
+
+        }
+        else {
+            // Single site
+            foreach ( $wp_roles->roles as $role_name => $role ) {
+                \remove_role( $role_name );
+            }
+
+            // Create and define WordPress default roles.
+            Roles::reset_to_default_roles();
         }
 
-        // Create and define WordPress default roles.
-        Roles::reset_to_default_roles();
     }
 }
 
