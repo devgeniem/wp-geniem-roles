@@ -736,6 +736,7 @@ final class Roles {
             ];
             $sites = \get_sites( $sites_args );
             foreach ( $sites as $site ) {
+                \set_time_limit( 30 );
                 \switch_to_blog( $site->blog_id );
 
                 foreach ( $wp_roles->roles as $role_name => $role ) {
