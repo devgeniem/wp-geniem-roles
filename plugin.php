@@ -654,6 +654,7 @@ final class Roles {
                 foreach ( $removed_user_caps_by_role as $role => $restricted_caps ) {
 
                     $edit_user_caps = [
+                        'add_user',
                         'edit_user',
                         'promote_user',
                     ];
