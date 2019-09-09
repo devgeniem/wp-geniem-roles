@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleases
 
+## [1.1.1] - 2019-09-09
+
+## Modified
+- Fixes a bug with a cap `add_user` and function `restrict_user_management_by_role()`.
+
 ## [1.1.0] - 2019-08-20
 
 ### Added

@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Ville Pietarinen / Geniem Oy
  * Author URI: https://geniem.fi
  */
@@ -654,6 +654,7 @@ final class Roles {
                 foreach ( $removed_user_caps_by_role as $role => $restricted_caps ) {
 
                     $edit_user_caps = [
+                        'add_user',
                         'edit_user',
                         'promote_user',
                     ];
