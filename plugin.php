@@ -591,11 +591,11 @@ final class Roles {
     /**
      * Add function to map_meta_cap which disallows certain actions for role in specifed posts.
      *
-     * @param string $name WP Role name.
-     * @param array  $blocked_posts Blocked posts.
-     * @param string $capability Capability which is disallowed for the user.
+     * @param string       $name WP Role name.
+     * @param array        $blocked_posts Blocked posts.
+     * @param string|array $capabilities Capabilities which is disallowed for the user.
      */
-    public static function restrict_post_edit( $name, $blocked_posts, $capability ) {
+    public static function restrict_post_edit( $name, $blocked_posts, $capabilities ) {
 
         $current_user = wp_get_current_user();
 
@@ -607,16 +607,32 @@ final class Roles {
              * Map_meta_cap arguments.
              *
              * $caps (array) Returns the user's actual capabilities.
-             * $cap (string) Capability name.
+             * $cap (string) Capabilities name.
              * $user_id (int) The user ID.
              * $args (array) Adds the context to the cap. Typically the object ID.
              */
-            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $blocked_posts, $name, $capability ) {
-                // $args[0] is the post id.
-                if ( $cap === $capability && in_array( $args[0], $blocked_posts, true ) ) {
-                    // This is default Wordpress way to restrict access.
-                    $caps[] = 'do_not_allow';
+            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $blocked_posts, $name, $capabilities ) {
+
+                if ( ! empty( $capabilities ) ) {
+
+                    if ( is_array( $capabilities ) ) {
+
+                        // $args[0] is the post id.
+                        if ( in_array( $cap, $capabilities ) && in_array( $args[0], $blocked_posts, true ) ) {
+                            // This is default Wordpress way to restrict access.
+                            $caps[] = 'do_not_allow';
+                        }
+                    }
+                    else {
+
+                        // $args[0] is the post id.
+                        if ( $cap === $capabilities && in_array( $args[0], $blocked_posts, true ) ) {
+                            // This is default Wordpress way to restrict access.
+                            $caps[] = 'do_not_allow';
+                        }
+                    }
                 }
+
                 return $caps;
             }, 10, 4 );
         }

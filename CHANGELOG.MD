@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleases
 
+## [restrict-post-edit-support-array] - 2019-10-02
+
+## Modified
+- Adds support for array of capabilities for `restrict_post_edit()`.
+
 ## [1.1.1] - 2019-09-09
 
 ## Modified

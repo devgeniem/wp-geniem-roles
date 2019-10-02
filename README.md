@@ -182,7 +182,13 @@ $restricted_posts = [
     2
 ];
 
-$admin->restrict_post_edit( $restricted_posts, $capability );
+// Restricted capabilities for the post.
+$capabilities = [
+    'delete_post',
+    'edit_post',
+];
+
+$admin->restrict_post_edit( $restricted_posts, $capabilities );
 ```
 
 ### Restrict user management by role
