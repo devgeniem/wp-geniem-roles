@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code.
- * Version: 1.1.2
+ * Version: 1.2.0
  * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Ville Pietarinen / Geniem Oy
  * Author URI: https://geniem.fi
  */
@@ -377,15 +377,15 @@ final class Roles {
 
                     $splitted_href = explode( '/', $node->href );
                     $end_of_url    = end( $splitted_href );
-    
+
                     $page_param_position = strpos( $end_of_url, '?page=' );
-    
+
                     // If page parameter take the end of the string.
                     if ( $page_param_position ) {
                         $end_of_url_position = $page_param_position + strlen( '?page=' );
                         $end_of_url          = substr( $end_of_url, $end_of_url_position );
                     }
-    
+
                     if ( self::in_array_r( $end_of_url, $menu_pages ) ) {
                         $wp_admin_bar->remove_node( $node->id );
                     }
@@ -409,7 +409,7 @@ final class Roles {
                 return true;
             }
         }
-    
+
         return false;
     }
 
@@ -775,7 +775,65 @@ final class Roles {
             // Create and define WordPress default roles.
             Roles::reset_to_default_roles();
         }
+    }
 
+    /**
+     * Restrict role templates.
+     * If called restricts other templates than added templates from the given role.
+     * Note 'default' template doesn't handle the same way.
+     *
+     * @param string        $name Role name.
+     * @param array|string  $allowed_templates Array of templates to be added for the role. 'default' If we want to enable only the default template for the role.
+     * @return mixed|void False on failure. No return if success.
+     */
+    public static function restrict_role_templates( $name, $allowed_templates ) {
+
+        // Fail fast.
+        if ( empty( $allowed_templates ) ) {
+            return false;
+        }
+
+        $current_user = wp_get_current_user();
+
+        // Check if we need to restrict current user.
+        if ( in_array( $name, $current_user->roles, true ) ) {
+
+            /**
+             * Filters list of page templates for a theme.
+             *
+             * @since 4.9.6
+             *
+             * @param string[]     $post_templates Array of page templates. Keys are filenames,
+             *                                     values are translated names.
+             */
+            add_filter( 'theme_templates', function( $post_templates ) use ( $allowed_templates ) {
+
+                // If we want to add multiple templates for the role.
+                if ( is_array( $allowed_templates ) ) {
+                    foreach ( $post_templates as $template_file => &$template_name ) {
+
+                        // If the template isn't in the allowed_templates remove it from the current user.
+                        if ( ! in_array( $template_file, $allowed_templates ) ) {
+
+                            unset( $post_templates[ $template_file ] );
+                        }
+                    }
+                }
+                else {
+
+                    // WordPress doesn't handle default template the same way as other templates.
+                    // Default template will always be available for the users.
+                    // Check if we wan't to enable only default template.
+                    if ( empty( $post_templates === 'default' ) ) {
+
+                        // Set post templates empty here.
+                        $post_templates = [];
+                    }
+                }
+
+                return $post_templates;
+            });
+        }
     }
 }
 
@@ -989,6 +1047,15 @@ class Role {
         return Roles::restrict_user_management_by_role( $this->name, $removed_user_caps_by_role );
     }
 
+    /**
+     * Restrict role templates.
+     *
+     * @param array|string  $allowed_templates Array of templates to be added for the role. 'default' If we want to enable only the default template for the role.
+     * @return mixed|void False on failure. No return if success.
+     */
+    public function restrict_role_templates( $allowed_templates ) {
+        return Roles::restrict_role_templates( $this->name, $allowed_templates );
+    }
 }
 
 /**
