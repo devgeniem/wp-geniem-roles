@@ -224,6 +224,30 @@ $custom_role_restricted_user_roles = [
 $custom_role->restrict_user_management_by_role( $custom_role_restricted_user_roles );
 ```
 
+### Restrict user template management by role.
+Function to restrict roles available templates. Add only templates that you want to enable.
+Array of slugs will be used ass a parameter. (You can inspect template slug from the wp-admin template dropdown.)
+`Note!: WordPress doesn't handle default template the same way as other templates.
+Default template will always be available for the users. If you want to enable only default template add string 'default' as a parameter.`
+
+```php
+
+    // Example 1
+    // Allow only default template for the user.
+    $role->restrict_role_templates( 'default' );
+```
+
+```php
+
+    // Example 2 allow
+    // page-frontpage.php and default template for the user.
+    $allowed_templates = [
+        'page-frontpage.php',
+    ];
+
+    $role->restrict_role_templates( $allowed_templates );
+```
+
 ### Grant super admin cap for a single user
 ```php
 \Geniem\Roles::grant_super_admin_cap( 1 );

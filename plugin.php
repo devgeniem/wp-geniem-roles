@@ -780,7 +780,8 @@ final class Roles {
     /**
      * Restrict role templates.
      * If called restricts other templates than added templates from the given role.
-     * Note 'default' template doesn't handle the same way.
+     * Note!: WordPress doesn't handle default template the same way as other templates.
+     * Default template will always be available for the users. If you want to enable only default template add string 'default' as a parameter.
      *
      * @param string        $name Role name.
      * @param array|string  $allowed_templates Array of templates to be added for the role. 'default' If we want to enable only the default template for the role.
