@@ -231,14 +231,12 @@ Array of slugs will be used ass a parameter. (You can inspect template slug from
 Default template will always be available for the users. If you want to enable only default template add string 'default' as a parameter.`
 
 ```php
-
     // Example 1
     // Allow only default template for the user.
     $role->restrict_role_templates( 'default' );
 ```
 
 ```php
-
     // Example 2 allow
     // page-frontpage.php and default template for the user.
     $allowed_templates = [
