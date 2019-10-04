@@ -6,12 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleases
 
-## [restrict-role-templates] - 2019-10-03
+## [1.2.0] - 2019-10-04
 
 ## Modified
 - Adds functions which makes possible to restrict roles available templates.
 
-## [restrict-post-edit-array-caps] - 2019-10-02
+## [1.1.2] - 2019-10-02
 
 ## Modified
 - Adds support for array of capabilities for `restrict_post_edit()`.
