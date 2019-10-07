@@ -66,11 +66,15 @@ wp-geniem-roles resets WordPress standard and custom roles with one method.
 \Geniem\Roles::reset_roles();
 ```
 
-### Reset Roles to WordPress default roles.
+### Reset roles to WordPress default roles.
 wp-geniem-roles resets all roles to WordPress default ones with one method.
 ```php
 \Geniem\Roles::reset_to_default_roles();
 ```
+
+### Reset roles on multisite with WP CLI
+Reset roles on multisite with CLI command. This resets all default roles and also all custom roles.
+```wp eval "\Geniem\Roles::reset_roles();"```
 
 ### WP CLI reset roles.
 You can also reset roles with WP CLI see the documentation from here.
