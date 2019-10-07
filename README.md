@@ -60,13 +60,13 @@ if ( is_wp_error( $new_role ) ) {
 ## Development guidelines
 User roles are stored in the database so you need to reset roles in the database after changes to the roles. This can be done with wp-geniem-roles or wp cli.
 
-### Reset roles with wp-geniem-roles.
+### Reset roles with wp-geniem-roles
 wp-geniem-roles resets WordPress standard and custom roles with one method.
 ```php
 \Geniem\Roles::reset_roles();
 ```
 
-### Reset roles to WordPress default roles.
+### Reset roles to WordPress default roles
 wp-geniem-roles resets all roles to WordPress default ones with one method.
 ```php
 \Geniem\Roles::reset_to_default_roles();
@@ -228,7 +228,7 @@ $custom_role_restricted_user_roles = [
 $custom_role->restrict_user_management_by_role( $custom_role_restricted_user_roles );
 ```
 
-### Restrict user template management by role.
+### Restrict user template management by role
 Function to restrict roles available templates. Add only templates that you want to enable.
 Array of slugs will be used ass a parameter. (You can inspect template slug from the wp-admin template dropdown.)
 `Note!: WordPress doesn't handle default template the same way as other templates.
