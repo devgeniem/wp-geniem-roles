@@ -129,9 +129,9 @@ final class Roles {
     /**
      * Create new roles
      *
-     * @param string  $name Role name in lowercase.
-     * @param string  $display_name Role display name.
-     * @param boolean $caps Capabilities to be added.
+     * @param string $name Role name in lowercase.
+     * @param string $display_name Role display name.
+     * @param array  $caps Capabilities to be added.
      */
     public static function create( $name, $display_name, $caps ) {
 
