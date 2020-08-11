@@ -313,6 +313,14 @@ final class Roles {
         // Run in admin_menu hook when called outside class
         add_action( 'admin_init', function() use ( $name, $menu_pages ) {
 
+            global $menu;
+
+            // In some weird cases $menu might be empty.
+            // Bail early if $menu is empty.
+            if ( empty( $menu ) ) {
+                return false;
+            }
+
             // user object
             $user = wp_get_current_user();
 
