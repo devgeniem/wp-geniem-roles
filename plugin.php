@@ -211,37 +211,26 @@ final class Roles {
      */
     public static function add_caps( $name, $caps ) {
 
-        // If role name is not set or caps are empty.
-        if ( ! empty( $name ) || ! empty( $caps ) ) {
-
-            // Get wp role
-            $role = \get_role( $name );
-
-            // Loop through removed caps.
-            foreach ( $caps as $cap ) {
-
-                // If cap isset for the role.
-                if ( isset( self::$roles[ $name ]->capabilities[ $cap ] ) ) {
-
-                    // Make sure that cap isn't true.
-                    if ( self::$roles[ $name ]->capabilities[ $cap ] !== true ) {
-
-                        // Add cap for a role.
-                        $role->add_cap( $cap );
-
-                    } else {
-
-                        return false;
-                    } // End if().
-                } else {
-
-                    // Add cap for a role.
-                    $role->add_cap( $cap );
-                } // End if().
-            } // End foreach().
-        } else {
+        // Fail fast if role name is not set or caps are empty.
+        if ( empty( $name ) || empty( $caps ) ) {
             return false;
         }
+
+        // Get wp role
+        $role = \get_role( $name );
+
+        // Loop through removed caps.
+        foreach ( $caps as $cap ) {
+
+            $cap_status = self::$roles[ $name ]->capabilities[ $cap ] ?? false;
+
+            // If cap is not true add cap.
+            if ( $cap_status !== true ) {
+
+                $role->add_cap( $cap );
+            }
+        }
+        unset( $cap );
     }
 
     /**
@@ -253,35 +242,26 @@ final class Roles {
      */
     public static function remove_caps( $name, $caps ) {
 
-        // If role name is not set or caps are empty.
-        if ( ! empty( $name ) || ! empty( $caps ) ) {
-
-            // Loop through removed caps.
-            foreach ( $caps as $cap ) {
-
-                // If cap isset for the role.
-                if ( isset( self::$roles[ $name ]->capabilities[ $cap ] ) ) {
-
-                    // Make sure that cap is true.
-                    if ( self::$roles[ $name ]->capabilities[ $cap ] === true ) {
-
-                            // Get wp role
-                            $role = \get_role( $name );
-
-                            // Remove cap for a role.
-                            $role->remove_cap( $cap );
-
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            } // End foreach().
-        } else {
+        // Fail fast if role name is not set or caps are empty
+        if ( empty( $name ) || empty( $caps ) ) {
             return false;
         }
 
+        // Get wp role
+        $role = \get_role( $name );
+
+        // Loop through removed caps.
+        foreach ( $caps as $cap ) {
+
+            $cap_status = self::$roles[ $name ]->capabilities[ $cap ] ?? false;
+
+            // If cap is true remove the cap.
+            if ( $cap_status === true ) {
+
+                $role->remove_cap( $cap );
+            }
+        }
+        unset( $cap );
     }
 
     /**
