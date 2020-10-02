@@ -62,6 +62,8 @@ User roles are stored in the database so you need to reset roles in the database
 
 ### Reset roles with wp-geniem-roles
 wp-geniem-roles resets WordPress standard and custom roles with one method.
+Note this is a slow process you don't want to run this on every page load.
+Helper function for debugging and controlled reseting of the roles.
 ```php
 \Geniem\Roles::reset_roles();
 ```

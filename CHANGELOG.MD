@@ -6,10 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-## [addcaps-hotfix] - 2020-09-29
+## [1.2.2] - 2020-10-02
 
 ## Fixed
-- Fixed functions add_caps() and remove_caps() for the default WordPress roles.
+- Fixed functions `add_caps()` and `remove_caps()` for the default WordPress roles.
 
 ## Released
 
