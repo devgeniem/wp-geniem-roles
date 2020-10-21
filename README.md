@@ -149,7 +149,10 @@ $admin_removable_admin_pages = [
     'plugin_page_slug',                     // Remove plugin page by plugin page slug
     // You can also remove submenu pages like so.
     'themes.php' => [
-        'themes.php'
+        'themes.php',
+        // Note geniem roles has automated feature to return customize with ease.
+        // No need for query parameters.
+        'customize.php',
     ],
 ];
 
