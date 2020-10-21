@@ -150,8 +150,8 @@ $admin_removable_admin_pages = [
     // You can also remove submenu pages like so.
     'themes.php' => [
         'themes.php',
-        // Note geniem roles has automated feature to return customize with ease.
-        // No need for query parameters.
+        // Note geniem roles has automated feature to remove 'customize.php' with ease.
+        // No need for usually required query parameters.
         'customize.php',
     ],
 ];
