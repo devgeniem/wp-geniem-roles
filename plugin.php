@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code.
- * Version: 1.2.2
+ * Version: 1.3.0
  * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Ville Pietarinen / Geniem Oy
  * Author URI: https://geniem.fi
  */
@@ -376,6 +376,39 @@ final class Roles {
 
                     if ( self::in_array_r( $end_of_url, $menu_pages ) ) {
                         $wp_admin_bar->remove_node( $node->id );
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Remove admin bar nodes
+     *
+     * @param string $name Role name.
+     * @param array  $removed_nodes Removed admin bar nodes.
+     * @return void
+     */
+    public static function remove_admin_bar_nodes( $name, $removed_nodes ) {
+
+        add_action( 'wp_before_admin_bar_render', function() use ( $name, $removed_nodes ) {
+
+            $user = wp_get_current_user();
+
+            if ( in_array( $name, $user->roles, true ) && ! wp_doing_ajax() ) {
+
+                global $wp_admin_bar;
+
+                $nodes = $wp_admin_bar->get_nodes();
+
+                if ( ! empty( $nodes ) ) {
+                    foreach ( $nodes as $key => $node ) {
+
+                        $node_id = $node->id ?? false;
+
+                        if ( ! empty( $node_id ) && self::in_array_r( $node_id, $removed_nodes ) ) {
+                            $wp_admin_bar->remove_node( $node_id );
+                        }
                     }
                 }
             }
@@ -971,6 +1004,15 @@ class Role {
      */
     public function remove_menu_pages( $menu_pages ) {
         Roles::remove_menu_pages( $this->name, $menu_pages );
+    }
+
+    /**
+     * Remove admin bar nodes.
+     *
+     * @param array $nodes An array of removable nodes.
+     */
+    public function remove_admin_bar_nodes( $nodes ) {
+        Roles::remove_admin_bar_nodes( $this->name, $nodes );
     }
 
     /**

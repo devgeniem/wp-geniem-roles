@@ -159,6 +159,18 @@ $admin_removable_admin_pages = [
 // Remove multiple menu pages remove_role_menu_pages( $role_slug, $menu_pages )
 $admin->remove_menu_pages( $admin_removable_admin_pages );
 ```
+### Remove admin bar nodes by a role
+You can remove admin bar nodes by a role with this function. See the example below for the details.
+```php
+/**
+ * Define removable admin bar nodes.
+ */
+$admin_removable_admin_bar_nodes = [
+    'post-new', // Default post type 'post' add new button.
+];
+
+$admin->remove_admin_bar_nodes( $admin_removable_admin_bar_nodes );
+```
 
 ### Restrict post editing and deleting
 This function makes easy and fast to restrict editing of certain posts. Pass restricted post as an array of post ids and choose which capabilities you want to restrict for them.

@@ -6,12 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [1.3.0] - 2020-12-10
+- Added a method `remove_admin_bar_nodes()`. This method removes admin bar nodes by node id.
+
+## Released
+
 ## [1.2.2] - 2020-10-02
 
 ## Fixed
 - Fixed functions `add_caps()` and `remove_caps()` for the default WordPress roles.
-
-## Released
 
 ## [1.2.1] - 2019-10-04
 
