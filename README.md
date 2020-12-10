@@ -160,7 +160,7 @@ $admin_removable_admin_pages = [
 $admin->remove_menu_pages( $admin_removable_admin_pages );
 ```
 ### Remove admin bar nodes by a role
-You can remove admin bar nodes by a role with this function. See the example below for the details.
+You can remove admin bar nodes by a role with a function `remove_admin_bar_nodes()`. See the example below for the details.
 ```php
 /**
  * Define removable admin bar nodes.
