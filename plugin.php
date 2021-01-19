@@ -46,8 +46,6 @@ final class Roles {
      */
     private function __construct() {
 
-        add_action( 'setup_theme', [ __CLASS__, 'reset_roles_on_admin_page' ] );
-
         // Actions
         add_action( 'setup_theme', [ __CLASS__, 'load_current_roles' ] );
         add_action( 'init', [ __CLASS__, 'add_options_page' ] );
@@ -70,20 +68,6 @@ final class Roles {
         // Skip enqueue geniem-roles-styles if not on wp-geniem-roles menu page.
         if ( in_array( $hook, $allowed, true ) ) {
             wp_enqueue_style( 'geniem_roles_styles', plugin_dir_url( __FILE__ ) . 'geniem-roles-styles.css', false, '1.0.6' );
-        }
-    }
-
-    /**
-     * Reset roles if current screen is.
-     */
-    public static function reset_roles_on_admin_page() {
-
-        if ( is_admin() ) {
-            $page_param = filter_input( INPUT_GET, 'page' );
-
-            if ( $page_param === 'wp-geniem-roles' ) {
-                self::reset_roles();
-            }
         }
     }
 

@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ## Released
-
+## [1.3.1] - 2021-01-19
+- Removed hook that resets roles on wp-geniem-roles admin page. This might cause undesired situations if users reset roles by accident. Use these methods instead https://github.com/devgeniem/wp-geniem-roles#reset-roles-with-wp-geniem-roles.
 ## [1.3.0] - 2020-12-10
 - Added a method `remove_admin_bar_nodes()`. This method removes admin bar nodes by node id.
 ## [1.2.2] - 2020-10-02
