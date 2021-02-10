@@ -190,7 +190,7 @@ final class Roles {
      * Add caps to the role.
      *
      * @param string $name Role name.
-     * @param string $caps Role capabilities.
+     * @param array  $caps Role capabilities to be added.
      * @return false On fail returns false.
      */
     public static function add_caps( $name, $caps ) {
