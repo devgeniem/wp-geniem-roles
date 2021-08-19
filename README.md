@@ -166,7 +166,7 @@ You can remove admin bar nodes by a role with a function `remove_admin_bar_nodes
  * Define removable admin bar nodes.
  */
 $admin_removable_admin_bar_nodes = [
-    'post-new', // Default post type 'post' add new button.
+    'new-post', // Default post type 'post' add new button.
 ];
 
 $admin->remove_admin_bar_nodes( $admin_removable_admin_bar_nodes );
