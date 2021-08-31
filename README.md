@@ -255,7 +255,7 @@ $restricted_posts_caps = [
     'delete_post',
 ];
 
-$administrator->grant_post_edit( $granted_post_ids, $granted_posts_caps, $restricted_posts_caps );
+$admin->grant_post_edit( $granted_post_ids, $granted_posts_caps, $restricted_posts_caps );
 ```
 
 ### Restrict user management by role
