@@ -675,7 +675,7 @@ final class Roles {
                     if ( is_array( $granted_posts_caps ) && ! empty( $args[0] ) ) {
 
                         // Restricted posts
-                        // If post is not in the allowed_posts restrict it.
+                        // If post is not in the granted_posts restrict it.
                         if ( ! in_array( $args[0], $granted_posts, true ) ) {
 
                             // If restricted posts has some caps the need to match the current cap.
@@ -689,7 +689,7 @@ final class Roles {
                                 $caps[] = 'do_not_allow';
                             }
                         }
-                        // Allowed posts
+                        // Granted posts
                         // If cap not matching -> do_not_allow.
                         else {
 
