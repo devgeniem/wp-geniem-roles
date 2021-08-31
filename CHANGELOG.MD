@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ## [1.4.0] - 2021-08-31
-- grant_post_edit() to grant posts with the given ids and caps. Note you can also define caps for the other posts.
+- grant_post_edit() to grant posts with the given ids and caps.
+- You can also define caps for the blocked posts.
 
 ## Released
 ## [1.3.1] - 2021-01-19

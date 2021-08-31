@@ -43,9 +43,9 @@ All new roles capabilities defaults to `false`. So we add just capabilities that
 // Caps to be added to the new role
 // all caps default to false see the details plugin.php \Geniem\Role::get_default_caps()
 $new_role_caps = array(
-    "activate_plugins"              => true,
-    "delete_others_pages"           => true,
-    "delete_others_posts"           => true
+    "activate_plugins"    => true,
+    "delete_others_pages" => true,
+    "delete_others_posts" => true,
 );
 
 // Create a new role "testrole" with wanted capabilities
@@ -210,6 +210,52 @@ $capabilities = [
 ];
 
 $admin->restrict_post_edit( $restricted_posts, $capabilities );
+```
+
+### Grant post editing
+This function makes easy and fast to grant posts by the given post ids and capabilities.
+Note you can also define caps for the other posts if not defined all caps will be blocked for the other posts.
+
+```php
+/**
+* All possible restricted capabilities are listed below
+* https://codex.wordpress.org/Function_Reference/map_meta_cap
+*/
+'delete_page'
+'delete_post'
+'delete_user'
+'edit_comment' (3.1. Mapped to 'edit_post' meta capability.)
+'edit_page'
+'edit_post'
+'edit_user'
+'publish_post' (3.5)
+'promote_user'
+'read_post'
+'read_page'
+'remove_user'
+```
+
+```php
+// Define restricted post IDs
+$frontpage_id = (int) get_option( 'page_on_front' );
+
+$granted_post_ids = [
+    $frontpage_id,
+    2
+];
+
+// Allow edit_post cap for granted posts.
+$granted_posts_caps = [
+    'edit_post',
+];
+
+// If empty all caps will be blocked.
+// Here we are allowing delete_post cap for other posts than $granted_post_ids.
+$restricted_posts_caps = [
+    'delete_post',
+];
+
+$administrator->grant_post_edit( $granted_post_ids, $granted_posts_caps, $restricted_posts_caps );
 ```
 
 ### Restrict user management by role

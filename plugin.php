@@ -646,10 +646,10 @@ final class Roles {
     /**
      * Grant rights for the role by the given post ids and capabilities.
      *
-     * @param string       $name WP Role name.
-     * @param array        $blocked_posts Blocked posts.
-     * @param string|array $allowed_posts_caps Capabilities which is sallowed for the user.
-     * @param string|array $restricted_posts_caps Capabilities which is sallowed for the user.
+     * @param string $name WP Role name.
+     * @param array  $blocked_posts Blocked posts.
+     * @param array  $allowed_posts_caps Capabilities which is allowed for the user.
+     * @param array  $restricted_posts_caps (optional) Capabilities which is allowed for the restricted posts.
      */
     public static function grant_post_edit( $name, $allowed_posts, $allowed_posts_caps, $restricted_posts_caps ) {
 
