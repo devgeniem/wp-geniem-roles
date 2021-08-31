@@ -644,6 +644,68 @@ final class Roles {
     }
 
     /**
+     * Grant rights for the role by the given post ids and capabilities.
+     *
+     * @param string       $name WP Role name.
+     * @param array        $blocked_posts Blocked posts.
+     * @param string|array $allowed_posts_caps Capabilities which is sallowed for the user.
+     * @param string|array $restricted_posts_caps Capabilities which is sallowed for the user.
+     */
+    public static function grant_post_edit( $name, $allowed_posts, $allowed_posts_caps, $restricted_posts_caps ) {
+
+        $current_user = wp_get_current_user();
+
+        // Add function to map_meta_cap which disallows certain actions for role in specifed posts.
+        // Check if we need to restrict current user.
+        if ( in_array( $name, $current_user->roles, true ) ) {
+
+            /**
+             * Map_meta_cap arguments.
+             *
+             * $caps (array) Returns the user's actual capabilities.
+             * $cap (string) Capabilities name.
+             * $user_id (int) The user ID.
+             * $args (array) Adds the context to the cap. Typically the object ID.
+             */
+            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $allowed_posts, $name, $allowed_posts_caps, $restricted_posts_caps ) {
+
+                if ( ! empty( $allowed_posts_caps ) ) {
+
+                    // Note $args[0] is empty on post list at first.
+                    if ( is_array( $allowed_posts_caps ) && ! empty( $args[0] ) ) {
+
+                        // Restricted posts
+                        // If post is not in the allowed_posts restrict it.
+                        if ( ! in_array( $args[0], $allowed_posts, true ) ) {
+
+                            // If restricted posts has some caps the need to match the current cap.
+                            if ( ! empty( $restricted_posts_caps ) ) {
+                                if ( ! in_array( $cap, $restricted_posts_caps ) ) {
+                                        $caps[] = 'do_not_allow';
+                                }
+                            }
+                            // If not given specific caps then we need to restrict all.
+                            else {
+                                $caps[] = 'do_not_allow';
+                            }
+                        }
+                        // Allowed posts
+                        // If cap not matching -> do_not_allow.
+                        else {
+
+                            if ( ! in_array( $cap, $allowed_posts_caps ) ) {
+                                $caps[] = 'do_not_allow';
+                            }
+                        }
+                    }
+                }
+
+                return $caps;
+            }, 10, 4 );
+        }
+    }
+
+    /**
      * Prevents user to create and manage users by the given user roles and capabilities.
      * Removes role from the admin side dropdowns if
      * 'edit_user' or 'promote_user' has been restricted.
@@ -1043,6 +1105,17 @@ class Role {
      */
     public function restrict_post_edit( $blocked_posts, $capability ) {
         return Roles::restrict_post_edit( $this->name, $blocked_posts, $capability );
+    }
+
+    /**
+     * Grant post editing capabilities by post ids.
+     *
+     * @param string $allowed_posts An array of blocked post ids.
+     * @param string $allowed_posts_caps Capability to allow for the role.
+     * @param string $restricted_posts_caps Capability to allow for the role.
+     */
+    public function grant_post_edit( $allowed_posts, $allowed_posts_caps, $restricted_posts_caps = [] ) {
+        return Roles::grant_post_edit( $this->name, $allowed_posts, $allowed_posts_caps, $restricted_posts_caps );
     }
 
     /**
