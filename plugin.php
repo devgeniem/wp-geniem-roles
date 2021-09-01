@@ -602,6 +602,11 @@ final class Roles {
      */
     public static function restrict_post_edit( $name, $blocked_posts, $capabilities ) {
 
+        // Fail fast.
+        if ( empty( $capabilities ) ) {
+            return;
+        }
+
         $current_user = wp_get_current_user();
 
         // Add function to map_meta_cap which disallows certain actions for role in specifed posts.
@@ -618,23 +623,20 @@ final class Roles {
              */
             \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $blocked_posts, $name, $capabilities ) {
 
-                if ( ! empty( $capabilities ) ) {
+                if ( is_array( $capabilities ) ) {
 
-                    if ( is_array( $capabilities ) ) {
-
-                        // $args[0] is the post id.
-                        if ( in_array( $cap, $capabilities ) && in_array( $args[0], $blocked_posts, true ) ) {
-                            // This is default Wordpress way to restrict access.
-                            $caps[] = 'do_not_allow';
-                        }
+                    // $args[0] is the post id.
+                    if ( in_array( $cap, $capabilities ) && in_array( $args[0], $blocked_posts, true ) ) {
+                        // This is default Wordpress way to restrict access.
+                        $caps[] = 'do_not_allow';
                     }
-                    else {
+                }
+                else {
 
-                        // $args[0] is the post id.
-                        if ( $cap === $capabilities && in_array( $args[0], $blocked_posts, true ) ) {
-                            // This is default Wordpress way to restrict access.
-                            $caps[] = 'do_not_allow';
-                        }
+                    // $args[0] is the post id.
+                    if ( $cap === $capabilities && in_array( $args[0], $blocked_posts, true ) ) {
+                        // This is default Wordpress way to restrict access.
+                        $caps[] = 'do_not_allow';
                     }
                 }
 
@@ -653,6 +655,11 @@ final class Roles {
      */
     public static function grant_post_edit( $name, $granted_posts, $granted_posts_caps, $restricted_posts_caps ) {
 
+        // Fail fast.
+        if ( empty( $granted_posts_caps ) || ! is_array( $granted_posts_caps ) ) {
+            return false;
+        }
+
         $current_user = wp_get_current_user();
 
         // Add function to map_meta_cap which disallows certain actions for role in specifed posts.
@@ -669,33 +676,30 @@ final class Roles {
              */
             \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $granted_posts, $name, $granted_posts_caps, $restricted_posts_caps ) {
 
-                if ( ! empty( $granted_posts_caps ) ) {
+                // Note $args[0] is empty on post list at first.
+                if ( ! empty( $args[0] ) ) {
 
-                    // Note $args[0] is empty on post list at first.
-                    if ( is_array( $granted_posts_caps ) && ! empty( $args[0] ) ) {
+                    // Restricted posts
+                    // If post is not in the granted_posts restrict it.
+                    if ( ! in_array( $args[0], $granted_posts, true ) ) {
 
-                        // Restricted posts
-                        // If post is not in the granted_posts restrict it.
-                        if ( ! in_array( $args[0], $granted_posts, true ) ) {
-
-                            // If restricted posts has some caps the need to match the current cap.
-                            if ( ! empty( $restricted_posts_caps ) ) {
-                                if ( ! in_array( $cap, $restricted_posts_caps ) ) {
-                                    $caps[] = 'do_not_allow';
-                                }
-                            }
-                            // If not given specific caps then we need to restrict all.
-                            else {
+                        // If restricted posts has some caps the need to match the current cap.
+                        if ( ! empty( $restricted_posts_caps ) ) {
+                            if ( ! in_array( $cap, $restricted_posts_caps ) ) {
                                 $caps[] = 'do_not_allow';
                             }
                         }
-                        // Granted posts
-                        // If cap not matching -> do_not_allow.
+                        // If not given specific caps then we need to restrict all.
                         else {
+                            $caps[] = 'do_not_allow';
+                        }
+                    }
+                    // Granted posts
+                    // If cap not matching -> do_not_allow.
+                    else {
 
-                            if ( ! in_array( $cap, $granted_posts_caps ) ) {
-                                $caps[] = 'do_not_allow';
-                            }
+                        if ( ! in_array( $cap, $granted_posts_caps ) ) {
+                            $caps[] = 'do_not_allow';
                         }
                     }
                 }
