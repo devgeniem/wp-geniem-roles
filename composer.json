@@ -1,7 +1,7 @@
 {
   "name": "devgeniem/wp-geniem-roles",
   "type": "wordpress-plugin",
-  "license": "GPL-2.0",
+  "license": "GPL-3.0",
   "description": "Wrapper class for WordPress role creation and manipulation.",
   "homepage": "https://github.com/devgeniem/wp-geniem-roles",
   "authors": [
