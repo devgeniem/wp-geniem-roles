@@ -687,8 +687,7 @@ final class Roles {
                     return $caps;
                 }
 
-                // If we want to restrict by post type we need to check
-                // if the handled post post type matches.
+                // Check if the $post_type parameter has been defined.
                 if ( ! empty( $post_types ) ) {
 
                     $current_post_type = \get_post( $args[0] )->post_type ?? '';
