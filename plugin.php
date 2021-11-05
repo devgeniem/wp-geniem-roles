@@ -652,9 +652,9 @@ final class Roles {
      * @param array  $blocked_posts Blocked posts.
      * @param array  $granted_posts_caps Capabilities which is allowed for the user.
      * @param array  $restricted_posts_caps (optional) Capabilities which is allowed for the restricted posts.
-     * @param string $post_type (optional) Post type to restrict. If defined other post types won't be handled.
+     * @param string $post_types (optional) Post types to restrict. If defined other post types won't be handled.
      */
-    public static function grant_post_edit( $name, $granted_posts, $granted_posts_caps, $restricted_posts_caps, $post_type ) {
+    public static function grant_post_edit( $name, $granted_posts, $granted_posts_caps, $restricted_posts_caps, $post_types ) {
 
         // Fail fast.
         if ( empty( $granted_posts_caps ) || ! is_array( $granted_posts_caps ) ) {
@@ -675,7 +675,7 @@ final class Roles {
              * $user_id (int) The user ID.
              * $args (array) Adds the context to the cap. Typically the object ID.
              */
-            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $granted_posts, $name, $granted_posts_caps, $restricted_posts_caps, $post_type ) {
+            \add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) use ( $granted_posts, $name, $granted_posts_caps, $restricted_posts_caps, $post_types ) {
 
                 // If we are not handling a post type capability.
                 if ( ! in_array( $cap, self::get_all_post_type_caps() ) ) {
@@ -689,12 +689,13 @@ final class Roles {
 
                 // If we want to restrict by post type we need to check
                 // if the handled post post type matches.
-                if ( ! empty( $post_type ) ) {
+                if ( ! empty( $post_types ) ) {
 
                     $current_post_type = \get_post( $args[0] )->post_type ?? '';
 
                     // If we are not handling a post with desired post type skip the handling.
-                    if ( $current_post_type !== $post_type ) {
+                    if ( ! in_array( $current_post_type, $post_types, true ) ) {
+
                         return $caps;
                     }
                 }
@@ -1160,10 +1161,10 @@ class Role {
      * @param string $granted_posts An array of blocked post ids.
      * @param string $granted_posts_caps Capability to allow for the role.
      * @param string $restricted_posts_caps (optional) Capabilities which is allowed for the restricted posts.
-     * @param string $post_type (optional) Post type to restrict if defined other post types won't be handled.
+     * @param string $post_types (optional) Post types to restrict. If defined other post types won't be handled.
      */
-    public function grant_post_edit( $granted_posts, $granted_posts_caps, $restricted_posts_caps = [], $post_type = '' ) {
-        return Roles::grant_post_edit( $this->name, $granted_posts, $granted_posts_caps, $restricted_posts_caps, $post_type );
+    public function grant_post_edit( $granted_posts, $granted_posts_caps, $restricted_posts_caps = [], $post_types = [] ) {
+        return Roles::grant_post_edit( $this->name, $granted_posts, $granted_posts_caps, $restricted_posts_caps, $post_types );
     }
 
     /**

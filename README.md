@@ -255,10 +255,10 @@ $restricted_posts_caps = [
     'delete_post',
 ];
 
-// Post type to restrict. If defined other post types won't be handled. (optional)
-$post_type = 'page';
+// Post types to restrict. If defined other post types won't be handled. (optional)
+$post_types = [ 'page' ];
 
-$admin->grant_post_edit( $granted_post_ids, $granted_posts_caps, $restricted_posts_caps, $post_typ );
+$admin->grant_post_edit( $granted_post_ids, $granted_posts_caps, $restricted_posts_caps, $post_types );
 ```
 
 ### Restrict user management by role
