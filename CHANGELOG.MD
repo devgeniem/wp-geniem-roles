@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [1.4.1] - 2021-08-31
+- grant_post_edit() hotfix to handle only post type related caps inside map_meta_cap().
+- Added parameter $post_type to the function `grant_post_edit()`.
+
 ## [1.4.0] - 2021-08-31
 - grant_post_edit() to grant posts with the given ids and caps.
 - You can also define caps for the blocked posts.

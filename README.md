@@ -250,12 +250,15 @@ $granted_posts_caps = [
 ];
 
 // If empty all caps will be blocked.
-// Here we are allowing delete_post cap for other posts than $granted_post_ids.
+// Here we are allowing delete_post cap for other posts than $granted_post_ids. (optional)
 $restricted_posts_caps = [
     'delete_post',
 ];
 
-$admin->grant_post_edit( $granted_post_ids, $granted_posts_caps, $restricted_posts_caps );
+// Post type to restrict. If defined other post types won't be handled. (optional)
+$post_type = 'page';
+
+$admin->grant_post_edit( $granted_post_ids, $granted_posts_caps, $restricted_posts_caps, $post_typ );
 ```
 
 ### Restrict user management by role
