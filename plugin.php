@@ -687,7 +687,7 @@ final class Roles {
                     return $caps;
                 }
 
-                // Check if the $post_type parameter has been defined.
+                // Check if the $post_types parameter has been defined.
                 if ( ! empty( $post_types ) ) {
 
                     $current_post_type = \get_post( $args[0] )->post_type ?? '';
