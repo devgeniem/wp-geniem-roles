@@ -6,15 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-## [1.4.1] - 2021-08-31
-- grant_post_edit() hotfix to handle only post type related caps inside map_meta_cap().
+## Released
+
+## [1.5.0] - 2021-11-11
+- `grant_post_edit()` hotfix to handle only post type related caps inside map_meta_cap().
 - Added parameter $post_types to the function `grant_post_edit()`.
 
 ## [1.4.0] - 2021-08-31
 - grant_post_edit() to grant posts with the given ids and caps.
 - You can also define caps for the blocked posts.
 
-## Released
 ## [1.3.1] - 2021-01-19
 - Removed hook that resets roles on wp-geniem-roles admin page. This might cause undesired situations if users reset roles by accident. Use these methods instead https://github.com/devgeniem/wp-geniem-roles#reset-roles-with-wp-geniem-roles.
 
