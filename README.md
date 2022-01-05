@@ -343,7 +343,7 @@ function filter_geniem_roles_menu_page_cap( $menu_page_cap ) {
 ```
 ## 'geniem/roles/default_roles'
 Filter new role default capabilities.
-- Default value: `By default Geniem Roles defines all capabilities to false example: [ 'post_edit' => false ]`
+- Default value: `By default Geniem Roles defines all capabilities to false.`
 - Parameter type: `array`
 ### Example usage
 ```php
