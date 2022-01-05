@@ -355,7 +355,7 @@ Filter new role default capabilities.
 function filter_geniem_roles_default_caps( $default_caps ) {
 
     $default_caps = [
-        'edit_posts' = true,
+        'edit_posts' => true,
     ];
 
     return $default_caps;
