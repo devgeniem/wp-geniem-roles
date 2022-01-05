@@ -322,9 +322,47 @@ Default template will always be available for the users. If you want to enable o
 ```
 
 # Filters
-## Filter new role default capabilities
-By default Geniem Roles defines all capabilities to false if you want to change the default capabilites for a new role use this filter.
-`apply_filters( 'geniem/roles/default_roles', $defaults );`
+## 'geniem/roles/add_menu_page_cap'
+Change wp-geniem-roles wp-admin menu capability.
+- Default value: `'activate_plugins'`
+- Parameter type: `string`
+
+### Example usage
+```php
+/**
+ * Filter wp-geniem-roles menu page capability.
+ *
+ * @return string WordPress capability.
+ */
+function filter_geniem_roles_menu_page_cap( $menu_page_cap ) {
+
+    return 'manage_options';
+}
+
+\add_filter( 'geniem/roles/add_menu_page_cap', 'filter_geniem_roles_menu_page_cap' );
+```
+## 'geniem/roles/default_roles'
+Filter new role default capabilities.
+- Default value: `By default Geniem Roles defines all capabilities to false example: [ 'post_edit' => false ]`
+- Parameter type: `array`
+### Example usage
+```php
+/**
+ * Filter wp-geniem-roles default capabilities for the new role.
+ *
+ * @return array An array of capabilities to be added to the new role automatically.
+ */
+function filter_geniem_roles_default_caps( $default_caps ) {
+
+    $default_caps = [
+        'edit_posts' = true,
+    ];
+
+    return $default_caps;
+}
+
+\add_filter( 'geniem/roles/default_roles', 'filter_geniem_roles_default_caps' );
+```
 
 # Admin page role listing
 `wp-geniem-roles` creates a admin page which lists all current active roles and their capabilities in the admin side. Admin page can be seen for roles that can `can_activate_plugins`.
