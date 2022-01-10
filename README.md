@@ -1,6 +1,43 @@
 # Geniem Roles
 Wrapper classes for developers to create and manipulate WordPress roles.
 
+# Table of contents
+- [Geniem Roles](#geniem-roles)
+- [Table of contents](#table-of-contents)
+- [Installation](#installation)
+  - [Composer installation](#composer-installation)
+  - [Manual installation](#manual-installation)
+- [Development guidelines](#development-guidelines)
+  - [Reset roles with wp-geniem-roles](#reset-roles-with-wp-geniem-roles)
+  - [Reset roles to WordPress default roles](#reset-roles-to-wordpress-default-roles)
+  - [Reset roles on multisite with WP CLI](#reset-roles-on-multisite-with-wp-cli)
+  - [WP CLI reset roles.](#wp-cli-reset-roles)
+- [Examples / Features](#examples--features)
+  - [Initializing Geniem Roles](#initializing-geniem-roles)
+  - [Create a new role with capabilities](#create-a-new-role-with-capabilities)
+  - [Get and manipulate a role](#get-and-manipulate-a-role)
+  - [Add caps for a role](#add-caps-for-a-role)
+  - [Remove caps from a role](#remove-caps-from-a-role)
+  - [Remove a role.](#remove-a-role)
+  - [Rename a role.](#rename-a-role)
+  - [Remove menu pages from a role](#remove-menu-pages-from-a-role)
+  - [Remove admin bar nodes by a role](#remove-admin-bar-nodes-by-a-role)
+  - [Restrict post editing and deleting](#restrict-post-editing-and-deleting)
+  - [Grant post editing](#grant-post-editing)
+  - [Restrict user management by role](#restrict-user-management-by-role)
+  - [Restrict user template management by role](#restrict-user-template-management-by-role)
+  - [Grant super admin cap for a single user](#grant-super-admin-cap-for-a-single-user)
+- [Filters](#filters)
+  - ['geniem/roles/add_menu_page_cap'](#geniemrolesadd_menu_page_cap)
+    - [Example usage](#example-usage)
+  - ['geniem/roles/default_roles'](#geniemrolesdefault_roles)
+    - [Example usage](#example-usage-1)
+- [Admin page role listing](#admin-page-role-listing)
+      - [screenshot](#screenshot)
+- [Admin page menu slugs](#admin-page-menu-slugs)
+- [Wiki](#wiki)
+
+# Installation
 ## Composer installation
 command line
 ```
@@ -19,7 +56,32 @@ composer.json
 ## Manual installation
 Move plugin to your WordPress installation `plugins/` folder.
 
-# Examples
+# Development guidelines
+User roles are stored in the database so you need to reset roles in the database after changes to the roles. This can be done with wp-geniem-roles or wp cli.
+
+## Reset roles with wp-geniem-roles
+wp-geniem-roles resets WordPress standard and custom roles with one method.
+Note this is a slow process you don't want to run this on every page load.
+Helper function for debugging and controlled reseting of the roles.
+```php
+\Geniem\Roles::reset_roles();
+```
+
+## Reset roles to WordPress default roles
+wp-geniem-roles resets all roles to WordPress default ones with one method.
+```php
+\Geniem\Roles::reset_to_default_roles();
+```
+
+## Reset roles on multisite with WP CLI
+Reset roles on multisite with CLI command. This resets all default roles and also all custom roles.
+```wp eval "\Geniem\Roles::reset_roles();"```
+
+## WP CLI reset roles.
+You can also reset roles with WP CLI see the documentation from here.
+https://developer.wordpress.org/cli/commands/role/
+
+# Examples / Features
 
 ## Initializing Geniem Roles
 Geniem roles plugin has been designed in singleton architecture. Singleton is created inside the plugin. After plugin has been activated you are able to use Geniem roles functions.
@@ -57,31 +119,6 @@ if ( is_wp_error( $new_role ) ) {
 }
 ```
 
-## Development guidelines
-User roles are stored in the database so you need to reset roles in the database after changes to the roles. This can be done with wp-geniem-roles or wp cli.
-
-### Reset roles with wp-geniem-roles
-wp-geniem-roles resets WordPress standard and custom roles with one method.
-Note this is a slow process you don't want to run this on every page load.
-Helper function for debugging and controlled reseting of the roles.
-```php
-\Geniem\Roles::reset_roles();
-```
-
-### Reset roles to WordPress default roles
-wp-geniem-roles resets all roles to WordPress default ones with one method.
-```php
-\Geniem\Roles::reset_to_default_roles();
-```
-
-### Reset roles on multisite with WP CLI
-Reset roles on multisite with CLI command. This resets all default roles and also all custom roles.
-```wp eval "\Geniem\Roles::reset_roles();"```
-
-### WP CLI reset roles.
-You can also reset roles with WP CLI see the documentation from here.
-https://developer.wordpress.org/cli/commands/role/
-
 ## Get and manipulate a role
 You can call existing role from WordPress by calling function `\Geniem\Roles::get( $role_slug );`. You can use a role as an object to manipulate the role. See the example from the below.
 
@@ -90,7 +127,7 @@ You can call existing role from WordPress by calling function `\Geniem\Roles::ge
 $admin = \Geniem\Roles::get( 'administrator' );
 ```
 
-### Add caps for a role
+## Add caps for a role
 ```php
 // Define desired capabilities for a role 'administrator'
 $admin_caps = [
@@ -101,7 +138,7 @@ $admin_caps = [
 $admin->add_caps( $admin_caps );
 ```
 
-### Remove caps from a role
+## Remove caps from a role
 ```php
 // Define removable caps in an array
 $admin_removable_caps = [
@@ -114,7 +151,7 @@ $admin_removable_caps = [
 $admin->remove_caps( $admin_removable_caps );
 ```
 
-### Remove a role.
+## Remove a role.
 ```php
 // Get a role.
 $author = \Geniem\Roles::get( 'author' );
@@ -126,13 +163,13 @@ if ( $author ) {
 }
 ```
 
-### Rename a role.
+## Rename a role.
 ```php
 // Rename a role
 $author->rename( 'New name' );
 ```
 
-### Remove menu pages from a role
+## Remove menu pages from a role
 You can remove single admin menu page with `string` value or multiple pages with an `array` value. You can also remove submenu pages. See the example below for the details.
 ```php
 /**
@@ -159,7 +196,7 @@ $admin_removable_admin_pages = [
 // Remove multiple menu pages remove_role_menu_pages( $role_slug, $menu_pages )
 $admin->remove_menu_pages( $admin_removable_admin_pages );
 ```
-### Remove admin bar nodes by a role
+## Remove admin bar nodes by a role
 You can remove admin bar nodes by a role with a function `remove_admin_bar_nodes()`. See the example below for the details.
 ```php
 /**
@@ -172,7 +209,7 @@ $admin_removable_admin_bar_nodes = [
 $admin->remove_admin_bar_nodes( $admin_removable_admin_bar_nodes );
 ```
 
-### Restrict post editing and deleting
+## Restrict post editing and deleting
 This function makes easy and fast to restrict editing of certain posts. Pass restricted post as an array of post ids and choose which capabilities you want to restrict for them.
 
 ```php
@@ -212,7 +249,7 @@ $capabilities = [
 $admin->restrict_post_edit( $restricted_posts, $capabilities );
 ```
 
-### Grant post editing
+## Grant post editing
 This function makes easy and fast to grant posts by the given post ids and capabilities.
 Note you can also define caps for the other posts if not defined all caps will be blocked for the other posts.
 
@@ -261,7 +298,7 @@ $post_types = [ 'page' ];
 $admin->grant_post_edit( $granted_post_ids, $granted_posts_caps, $restricted_posts_caps, $post_types );
 ```
 
-### Restrict user management by role
+## Restrict user management by role
 Function to restrict users to manage users by the given roles and capabilities.
 Role will be removed from the WordPress admin user management dropdowns for example bulk action "Change role to" if the role has been restricted with the caps `edit_user` or `promote_user`.
 
@@ -294,7 +331,7 @@ $custom_role_restricted_user_roles = [
 $custom_role->restrict_user_management_by_role( $custom_role_restricted_user_roles );
 ```
 
-### Restrict user template management by role
+## Restrict user template management by role
 Function to restrict roles available templates. Add only templates that you want to enable.
 Array of slugs will be used ass a parameter. (You can inspect template slug from the wp-admin template dropdown.)
 `Note!: WordPress doesn't handle default template the same way as other templates.
@@ -316,7 +353,7 @@ Default template will always be available for the users. If you want to enable o
     $role->restrict_role_templates( $allowed_templates );
 ```
 
-### Grant super admin cap for a single user
+## Grant super admin cap for a single user
 ```php
 \Geniem\Roles::grant_super_admin_cap( 1 );
 ```
