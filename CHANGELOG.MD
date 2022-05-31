@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ## Released
+## [1.5.1] - 2022-05-31
+- Optimized admin screenshot.
 
 ## [1.5.0] - 2021-11-11
 - `grant_post_edit()` hotfix to handle only post type related caps inside map_meta_cap().
