@@ -184,7 +184,7 @@ You can remove single admin menu page with `string` value or multiple pages with
 $admin_removable_admin_pages = [
     'edit.php',                             // Posts
     'edit.php?post_type=page',              // Pages
-    'edit.php?post_type=acf-field-group'    // Advanced Custom Fields
+    'edit.php?post_type=acf-field-group',   // Advanced Custom Fields
     'plugin_page_slug',                     // Remove plugin page by plugin page slug
     // You can also remove submenu pages like so.
     'themes.php' => [
