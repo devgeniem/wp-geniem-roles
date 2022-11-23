@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ## Released
+## [1.5.2] - 2022-11-23
+- Fixed role renaming `rename()` (props [@jmaekki](https://github.com/jmaekki)).
+
 ## [1.5.1] - 2022-05-31
 - Optimized admin screenshot.
 
