@@ -183,7 +183,7 @@ final class Roles {
         $wp_roles->role_names[ $name ]    = $new_display_name;
 
         // Update also geniem roles instance name.
-        self::$roles[ $name ]->name = $new_display_name;
+        self::$roles[ $name ]->display_name = $new_display_name;
     }
 
     /**
