@@ -28,9 +28,9 @@ Wrapper classes for developers to create and manipulate WordPress roles.
   - [Restrict user template management by role](#restrict-user-template-management-by-role)
   - [Grant super admin cap for a single user](#grant-super-admin-cap-for-a-single-user)
 - [Filters](#filters)
-  - ['geniem/roles/add_menu_page_cap'](#geniemrolesadd_menu_page_cap)
+  - ['geniem/roles/add\_menu\_page\_cap'](#geniemrolesadd_menu_page_cap)
     - [Example usage](#example-usage)
-  - ['geniem/roles/default_roles'](#geniemrolesdefault_roles)
+  - ['geniem/roles/default\_roles'](#geniemrolesdefault_roles)
     - [Example usage](#example-usage-1)
 - [Admin page role listing](#admin-page-role-listing)
       - [screenshot](#screenshot)
@@ -382,7 +382,6 @@ function filter_geniem_roles_menu_page_cap( $menu_page_cap ) {
 ```
 ## 'geniem/roles/default_roles'
 Filter new role default capabilities.
-- Default value: `By default Geniem Roles defines all capabilities to false.`
 - Parameter type: `array`
 ### Example usage
 ```php
