@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [remove-default-false-caps] - 2024-01-29
+- Removed role default caps false value. Default caps has been listed in wiki page from now on.
+
 ## Released
 ## [1.5.2] - 2022-11-23
 - Fixed role renaming `rename()` (props [@jmaekki](https://github.com/jmaekki)).

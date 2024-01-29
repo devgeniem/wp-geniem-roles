@@ -983,76 +983,11 @@ class Role {
      */
     public static function get_default_caps() {
 
-        $defaults = array(
-
-            // Network (Super Admin)
-            'create_sites'              => false,
-            'delete_sites'              => false,
-            'manage_network'            => false,
-            'manage_sites'              => false,
-            'manage_network_plugins'    => false,
-            'manage_network_themes'     => false,
-            'manage_network_options'    => false,
-            'manage_network_users'      => false,
-
-            // CSS
-            'edit_css'                  => false,
-
-            /** ------------------------------------------------------
-             *  Users
-             *
-             *  On network installation user creation needs also
-             *  site option add_new_user.
-             *
-             *  The setting can be found from the wp-admin
-             *  https://sitedomain.com/wp-admin/network/settings.php
-             *  ------------------------------------------------------ */
-
-            'add_users'                 => false,
-            'create_users'              => false,
-            'delete_users'              => false,
-            'edit_users'                => false,
-            'list_users'                => false,
-            'promote_users'             => false,
-
-            // WordPress default capabilities
-            'activate_plugins'          => false,
-            'delete_others_pages'       => false,
-            'delete_others_posts'       => false,
-            'delete_pages'              => false,
-            'delete_posts'              => false,
-            'delete_private_pages'      => false,
-            'delete_private_posts'      => false,
-            'delete_published_pages'    => false,
-            'delete_published_posts'    => false,
-            'edit_dashboard'            => false,
-            'edit_others_pages'         => false,
-            'edit_others_posts'         => false,
-            'edit_pages'                => false,
-            'edit_posts'                => false,
-            'edit_private_pages'        => false,
-            'edit_private_posts'        => false,
-            'edit_published_pages'      => false,
-            'edit_published_posts'      => false,
-            'edit_theme_options'        => false,
-            'export'                    => false,
-            'import'                    => false,
-            'manage_categories'         => false,
-            'manage_links'              => false,
-            'manage_options'            => false,
-            'moderate_comments'         => false,
-            'publish_pages'             => false,
-            'publish_posts'             => false,
-            'read_private_pages'        => false,
-            'read_private_posts'        => false,
-            'read'                      => false,
-            'remove_users'              => false,
-            'switch_themes'             => false,
-            'upload_files'              => false,
-        );
+        // Default to empty list.
+        $defaults = [];
 
         // filter default caps
-        return apply_filters( 'geniem/roles/default_roles', $defaults );
+        return \apply_filters( 'geniem/roles/default_roles', $defaults );
     }
 
     /**
