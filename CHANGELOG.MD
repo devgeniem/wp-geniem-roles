@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Released
 
 ## [1.6.0] - 2024-01-31
-- Removed role default caps false value.
+- Removed role default caps false values.
 - Default caps has been listed in wiki page from now on.
 
 ## [1.5.2] - 2022-11-23
