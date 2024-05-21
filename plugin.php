@@ -1111,8 +1111,8 @@ class Role {
     /**
      * Restrict post editing capabilities by post ids.
      *
-     * @param array  $blocked_posts An array of blocked post ids.
-     * @param string $capability Capability to restrict for the role.
+     * @param array        $blocked_posts An array of blocked post ids.
+     * @param string|array $capability Capability to restrict for the role.
      * @return void
      */
     public function restrict_post_edit( $blocked_posts, $capability ) {
