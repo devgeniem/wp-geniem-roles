@@ -3,7 +3,7 @@
  * Plugin Name: Geniem Roles
  * Plugin URI: https://github.com/devgeniem/wp-geniem-roles
  * Description: WordPress plugin to edit and create roles in code.
- * Version: 1.6.0
+ * Version: 1.6.1
  * Author: Timi-Artturi Mäkelä / Anttoni Lahtinen / Ville Siltala / Ville Pietarinen / Geniem Oy
  * Author URI: https://geniem.fi
  */
@@ -31,6 +31,8 @@ final class Roles {
 
     /**
      * Init roles singleton.
+     *
+     * @return self
      */
     public static function instance() {
 
@@ -74,6 +76,8 @@ final class Roles {
     /**
      * Loads all active roles.
      * $wp_roles isn't available before setup_theme hook.
+     *
+     * @return void
      */
     public static function load_current_roles() {
 
@@ -101,7 +105,7 @@ final class Roles {
     /**
      * Returns all role instances created from active roles.
      *
-     * @return array $roles;
+     * @return array Array of role instances.
      */
     public static function get_roles() {
 
@@ -116,6 +120,7 @@ final class Roles {
      * @param string $name Role name in lowercase.
      * @param string $display_name Role display name.
      * @param array  $caps Capabilities to be added.
+     * @return \Geniem\Role Role instance.
      */
     public static function create( $name, $display_name, $caps ) {
 
@@ -144,7 +149,7 @@ final class Roles {
      * Check if role exists.
      *
      * @param string $name Role name.
-     * @return null|object $role|null role object or null.
+     * @return bool True if role exists.
      */
     public static function role_exists( $name ) {
 
@@ -157,6 +162,7 @@ final class Roles {
      * Remove roles.
      *
      * @param string $name Role name.
+     * @return void
      */
     public static function remove_role( $name ) {
 
@@ -189,9 +195,9 @@ final class Roles {
     /**
      * Add caps to the role.
      *
-     * @param string $name Role name.
-     * @param array  $caps Role capabilities to be added.
-     * @return false On fail returns false.
+     * @param string      $name Role name.
+     * @param array       $caps Role capabilities to be added.
+     * @return void|false On fail returns false.
      */
     public static function add_caps( $name, $caps ) {
 
@@ -220,9 +226,9 @@ final class Roles {
     /**
      * Remove capabilities from a role.
      *
-     * @param string $name Role slug.
-     * @param array  $caps Array of capabilities to be removed.
-     * @return false On fail returns false.
+     * @param string      $name Role slug.
+     * @param array       $caps Array of capabilities to be removed.
+     * @return void|false On fail returns false.
      */
     public static function remove_caps( $name, $caps ) {
 
@@ -253,6 +259,7 @@ final class Roles {
      * insert int or string
      *
      * @param string $name Role name.
+     * @return \Geniem\Role|null Role instance or null if it doesn't exist.
      */
     public static function get( $name ) {
 
@@ -268,9 +275,9 @@ final class Roles {
      * Remove menu pages from a role.
      * note: All menu page slugs can be found from the admin Geniem Roles -> Menu slugs.
      *
-     * @param string $name Role name.
-     * @param string $menu_pages Menu page slugs.
-     * @return false On fail returns false.
+     * @param string            $name Role name.
+     * @param string|array|null $menu_pages Menu page slugs.
+     * @return void|false       On fail returns false.
      */
     public static function remove_menu_pages( $name = '', $menu_pages = null ) {
 
@@ -403,7 +410,7 @@ final class Roles {
      * Recursive in array function.
      *
      * @param string $needle String value to be fetched.
-     * @param array $haystack Multidimensional array.
+     * @param array  $haystack Multidimensional array.
      * 
      * @return boolean If value was found.
      */
@@ -421,14 +428,17 @@ final class Roles {
     /**
      * Add a user to the Super admin user list in WordPress Multisite.
      *
-     * @param string $user_id User ID.
+     * @param int $user_id User ID.
+     * @return void
      */
     public static function grant_super_admin_cap( $user_id ) {
         grant_super_admin( $user_id );
     }
 
     /**
-     * Adds WP Ga options settings
+     * Adds WP Ga options settings.
+     *
+     * @return void
      */
     public static function add_options_page() {
 
@@ -463,6 +473,8 @@ final class Roles {
 
     /**
      * Geniem roles printable html.
+     *
+     * @return void
      */
     public static function geniem_roles_html() {
 
@@ -523,6 +535,8 @@ final class Roles {
 
     /**
      * Geniem roles menu items slug list.
+     *
+     * @return void
      */
     public static function geniem_roles_slug_html() {
 
@@ -599,6 +613,7 @@ final class Roles {
      * @param string       $name WP Role name.
      * @param array        $blocked_posts Blocked posts.
      * @param string|array $capabilities Capabilities which is disallowed for the user.
+     * @return void
      */
     public static function restrict_post_edit( $name, $blocked_posts, $capabilities ) {
 
@@ -652,7 +667,8 @@ final class Roles {
      * @param array  $blocked_posts Blocked posts.
      * @param array  $granted_posts_caps Capabilities which is allowed for the user.
      * @param array  $restricted_posts_caps (optional) Capabilities which is allowed for the restricted posts.
-     * @param string $post_types (optional) Post types to restrict. If defined other post types won't be handled.
+     * @param array  $post_types (optional) Post types to restrict. If defined other post types won't be handled.
+     * @return void|false On fail returns false.
      */
     public static function grant_post_edit( $name, $granted_posts, $granted_posts_caps, $restricted_posts_caps, $post_types ) {
 
@@ -731,7 +747,7 @@ final class Roles {
     /**
      * Get all post type caps.
      *
-     * @return void
+     * @return array Array of post type capabilities.
      */
     private static function get_all_post_type_caps() {
 
@@ -767,6 +783,7 @@ final class Roles {
      *
      * @param string $name Name of the role.
      * @param array  $removed_user_caps_by_role Associative array of role specific restricted caps.
+     * @return void
      */
     public static function restrict_user_management_by_role( $name, $removed_user_caps_by_role ) {
 
@@ -840,6 +857,8 @@ final class Roles {
 
     /**
      * Helper function reset default WordPress roles.
+     *
+     * @return void
      */
     public static function reset_to_default_roles() {
         require_once( ABSPATH . 'wp-admin/includes/schema.php' );
@@ -899,7 +918,7 @@ final class Roles {
      *
      * @param string        $name Role name.
      * @param array|string  $allowed_templates Array of templates to be added for the role. 'default' If we want to enable only the default template for the role.
-     * @return mixed|void False on failure. No return if success.
+     * @return void|false   False on failure. No return if success.
      */
     public static function restrict_role_templates( $name, $allowed_templates ) {
 
@@ -980,6 +999,8 @@ class Role {
 
     /**
      * Get default caps for roles
+     *
+     * @return array Default capabilities.
      */
     public static function get_default_caps() {
 
@@ -1018,6 +1039,8 @@ class Role {
 
     /**
      * Remove a role.
+     *
+     * @return void
      */
     public function remove() {
         Roles::remove_role( $this->name );
@@ -1029,6 +1052,7 @@ class Role {
      * @param array $menu_pages Mixed array of removable admin menu items.
      * Array value can be a string or
      * assoaciative array item 'parent_slug' => [ 'submenu_item1_slug', 'submenu_item2_slug' ].
+     * @return void
      */
     public function remove_menu_pages( $menu_pages ) {
         Roles::remove_menu_pages( $this->name, $menu_pages );
@@ -1038,6 +1062,7 @@ class Role {
      * Remove admin bar nodes.
      *
      * @param array $nodes An array of removable nodes.
+     * @return void
      */
     public function remove_admin_bar_nodes( $nodes ) {
         Roles::remove_admin_bar_nodes( $this->name, $nodes );
@@ -1048,6 +1073,7 @@ class Role {
      * Makes db changes do not run everytime.
      *
      * @param array $caps An array of capabilities.
+     * @return void
      */
     public function add_caps( $caps ) {
         Roles::add_caps( $this->name, $caps );
@@ -1065,6 +1091,8 @@ class Role {
 
     /**
      * Get all caps from a role.
+     *
+     * @return array Role capabilities.
      */
     public function get_caps() {
         return \get_role( $this->name )->capabilities;
@@ -1074,6 +1102,7 @@ class Role {
      * Rename a role.
      *
      * @param string $new_display_name Display name for a role.
+     * @return void
      */
     public function rename( $new_display_name ) {
         return Roles::rename( $this->name, $new_display_name );
@@ -1082,8 +1111,9 @@ class Role {
     /**
      * Restrict post editing capabilities by post ids.
      *
-     * @param string $blocked_posts An array of blocked post ids.
+     * @param array  $blocked_posts An array of blocked post ids.
      * @param string $capability Capability to restrict for the role.
+     * @return void
      */
     public function restrict_post_edit( $blocked_posts, $capability ) {
         return Roles::restrict_post_edit( $this->name, $blocked_posts, $capability );
@@ -1092,10 +1122,11 @@ class Role {
     /**
      * Grant post editing capabilities by post ids.
      *
-     * @param string $granted_posts An array of blocked post ids.
-     * @param string $granted_posts_caps Capability to allow for the role.
-     * @param string $restricted_posts_caps (optional) Capabilities which is allowed for the restricted posts.
-     * @param string $post_types (optional) Post types to restrict. If defined other post types won't be handled.
+     * @param array $granted_posts An array of blocked post ids.
+     * @param array $granted_posts_caps Capability to allow for the role.
+     * @param array $restricted_posts_caps (optional) Capabilities which is allowed for the restricted posts.
+     * @param array $post_types (optional) Post types to restrict. If defined other post types won't be handled.
+     * @return void
      */
     public function grant_post_edit( $granted_posts, $granted_posts_caps, $restricted_posts_caps = [], $post_types = [] ) {
         return Roles::grant_post_edit( $this->name, $granted_posts, $granted_posts_caps, $restricted_posts_caps, $post_types );
@@ -1113,6 +1144,7 @@ class Role {
      * ],
      *
      * @param array $removed_user_caps_by_role Associative array of role specific restricted caps.
+     * @return void
      */
     public function restrict_user_management_by_role( $removed_user_caps_by_role ) {
         return Roles::restrict_user_management_by_role( $this->name, $removed_user_caps_by_role );
@@ -1121,8 +1153,8 @@ class Role {
     /**
      * Restrict role templates.
      *
-     * @param array|string  $allowed_templates Array of templates to be added for the role. 'default' If we want to enable only the default template for the role.
-     * @return mixed|void False on failure. No return if success.
+     * @param array|string $allowed_templates Array of templates to be added for the role. 'default' If we want to enable only the default template for the role.
+     * @return void|false  False on failure. No return if success.
      */
     public function restrict_role_templates( $allowed_templates ) {
         return Roles::restrict_role_templates( $this->name, $allowed_templates );

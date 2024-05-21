@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Released
 
+## [1.6.1] - 2024-05-20
+- Fix method param and return types.
+
 ## [1.6.0] - 2024-01-31
 - Removed role default caps false values.
 - Default caps has been listed in wiki page from now on.
